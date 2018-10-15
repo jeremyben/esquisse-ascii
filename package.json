@@ -1,0 +1,26 @@
+{
+	"name": "esquisse-ascii",
+	"version": "0.1.0",
+	"author": "Jeremy Bensimon <bensimon.jeremy@gmail.com>",
+	"license": "MIT",
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"start": "parcel src/index.html",
+		"build": "parcel build src/index.html",
+		"test": "jest --watchAll"
+	},
+	"jest": {
+		"preset": "ts-jest",
+		"testEnvironment": "jsdom"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@types/jest": "^23.3.5",
+		"jest": "^23.6.0",
+		"parcel-bundler": "^1.10.3",
+		"ts-jest": "^23.10.4",
+		"typescript": "^3.1.3"
+	}
+}
