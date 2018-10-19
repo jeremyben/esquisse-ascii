@@ -23,4 +23,6 @@ declare interface BlockData {
 	lines: string[]
 	header: string
 	padding: [number, number] // X Y
+	topLeftLocation?: [number, number] // X Y
+	bottomRightLocation?: [number, number] // X Y
 }

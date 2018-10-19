@@ -76,3 +76,17 @@ export const charMaps = {
 	asciiRounded
 }
 
+/**
+ * Naive implementation of guessing characters map.
+ * Based on top left character, since it's different in every map.
+ */
+export function guessCharMap(ascii: string): CharMap {
+	let charMap
+
+	for (const key of Object.keys(charMaps)) {
+		if (ascii.indexOf(charMaps[key].topLeft) > -1) charMap = charMaps[key]
+		else charMap = unicodeSingle
+	}
+
+	return charMap as CharMap
+}
