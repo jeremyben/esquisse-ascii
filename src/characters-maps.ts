@@ -1,6 +1,4 @@
-import { CharMap } from './types'
-
-export const unicodeSingleMap: CharMap = {
+const unicodeSingle: CharMap = {
 	horizontal: '─',
 	vertical: '│',
 	topLeft: '┌',
@@ -14,7 +12,7 @@ export const unicodeSingleMap: CharMap = {
 	junctionMiddle: '┼'
 }
 
-export const unicodeRoundedMap: CharMap = {
+const unicodeRounded: CharMap = {
 	horizontal: '─',
 	vertical: '│',
 	topLeft: '╭',
@@ -28,7 +26,7 @@ export const unicodeRoundedMap: CharMap = {
 	junctionMiddle: '┼'
 }
 
-export const unicodeDoubleMap: CharMap = {
+const unicodeDouble: CharMap = {
 	horizontal: '═',
 	vertical: '║',
 	topLeft: '╔',
@@ -42,7 +40,7 @@ export const unicodeDoubleMap: CharMap = {
 	junctionMiddle: '╬'
 }
 
-export const asciiSingleMap: CharMap = {
+const asciiSingle: CharMap = {
 	horizontal: '-',
 	vertical: '|',
 	topLeft: '+',
@@ -56,7 +54,7 @@ export const asciiSingleMap: CharMap = {
 	junctionMiddle: '+'
 }
 
-export const asciiRoundedMap: CharMap = {
+const asciiRounded: CharMap = {
 	horizontal: '-',
 	vertical: '|',
 	topLeft: '.',
@@ -69,3 +67,12 @@ export const asciiRoundedMap: CharMap = {
 	junctionBottom: '+',
 	junctionMiddle: '+'
 }
+
+export const charMaps = {
+	unicodeSingle,
+	unicodeRounded,
+	unicodeDouble,
+	asciiSingle,
+	asciiRounded
+}
+

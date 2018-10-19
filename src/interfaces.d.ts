@@ -1,6 +1,7 @@
-export type Spacing = { top: number; right: number; bottom: number; left: number }
-
-export type CharMap = {
+/**
+ * Ascii characters map
+ */
+declare interface CharMap {
 	horizontal: string
 	vertical: string
 	topLeft: string
@@ -12,4 +13,14 @@ export type CharMap = {
 	junctionTop: string
 	junctionBottom: string
 	junctionMiddle: string
+}
+
+/**
+ * Data exchange format between html and ascii
+ */
+declare interface BlockData {
+	id: number
+	lines: string[]
+	header: string
+	padding: [number, number] // X Y
 }

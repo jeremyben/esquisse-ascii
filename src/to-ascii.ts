@@ -1,34 +1,42 @@
-import { Spacing, CharMap } from './types'
+import { getMaxLength } from './utils'
 
-export function toAscii(container: Element, charMap: CharMap): string {
-	const { lines, title, innerWidth, padding } = parseContainer(container)
-	const ascii = doTransform(lines, title, innerWidth, padding, charMap)
-
+/**
+ * get ascii text from HTML element
+ */
+export function toAscii(element: Element, charMap: CharMap): string {
+	const block = parseHtmlComponent(element)
+	const ascii = makeAsciiComponent(block, charMap)
 	return ascii
 }
 
-function doTransform(lines: string[], title: string, innerWidth: number, padding: Spacing, charMap: CharMap) {
+/**
+ * Get ascii text from block metadata
+ */
+function makeAsciiComponent(block: BlockData, charMap: CharMap): string {
+	const { lines, header, padding } = block
+	const [paddingX, paddingY] = padding
+	const innerWidth = getMaxLength([...lines, header])
+
 	let ascii = makeTopBar(true)
 
-	if (title) {
-		ascii += makeTextRow(title, true, true)
+	if (header) {
+		ascii += makeTextRow(header, true, true)
 		ascii += makeSeparatorBar(true)
 	}
 
-	ascii += makeTextRow('', true).repeat(padding.top)
+	ascii += makeTextRow('', true).repeat(paddingY)
 
 	for (const line of lines) {
 		ascii += makeTextRow(line, true)
 	}
 
-	ascii += makeTextRow('', true).repeat(padding.bottom)
+	ascii += makeTextRow('', true).repeat(paddingY)
 	ascii += makeBottomBar()
 
 	return ascii
 
 	function makeTextRow(word: string, breakline = false, center = false) {
-		const leftPaddingFill = ' '.repeat(padding.left)
-		const rightPaddingFill = ' '.repeat(padding.right)
+		const paddingFill = ' '.repeat(paddingX)
 
 		const remaining = innerWidth - word.length
 		let leftMiddleFill: string
@@ -43,7 +51,7 @@ function doTransform(lines: string[], title: string, innerWidth: number, padding
 		}
 
 		let wordRow =
-			charMap.vertical + leftPaddingFill + leftMiddleFill + word + rightMiddleFill + rightPaddingFill + charMap.vertical
+			charMap.vertical + paddingFill + leftMiddleFill + word + rightMiddleFill + paddingFill + charMap.vertical
 
 		if (breakline) wordRow += '\n'
 
@@ -54,7 +62,7 @@ function doTransform(lines: string[], title: string, innerWidth: number, padding
 		const start = charMap.topLeft
 		const middle = charMap.horizontal
 		const end = charMap.topRight
-		const width = innerWidth + padding.left + padding.right
+		const width = innerWidth + paddingX * 2
 
 		let topBar = makeHorizontalBar(width, { start, middle, end })
 		if (breakline) topBar += '\n'
@@ -66,7 +74,7 @@ function doTransform(lines: string[], title: string, innerWidth: number, padding
 		const start = charMap.junctionLeft
 		const middle = charMap.horizontal
 		const end = charMap.junctionRight
-		const width = innerWidth + padding.left + padding.right
+		const width = innerWidth + paddingX * 2
 
 		let separatorBar = makeHorizontalBar(width, { start, middle, end })
 		if (breakline) separatorBar += '\n'
@@ -78,69 +86,65 @@ function doTransform(lines: string[], title: string, innerWidth: number, padding
 		const start = charMap.bottomLeft
 		const middle = charMap.horizontal
 		const end = charMap.bottomRight
-		const width = innerWidth + padding.left + padding.right
+		const width = innerWidth + paddingX * 2
 
 		let bottomBar = makeHorizontalBar(width, { start, middle, end })
 		if (breakline) bottomBar += '\n'
 
 		return bottomBar
 	}
+
+	function makeHorizontalBar(
+		middleWidth: number,
+		{ start, middle, end }: { start: string; middle: string; end: string }
+	) {
+		const middleFill = middle.repeat(middleWidth)
+		return start + middleFill + end
+	}
 }
 
-function parseContainer(container: Element) {
-	const lines = getLines(container)
-	const title = getTitle(container)
-	const innerWidth = getInnerWidth([...lines, title])
-	const padding = getPadding(container)
+/**
+ * Get block metadata from HTML component
+ */
+function parseHtmlComponent(component: Element): BlockData {
+	const id = getId(component)
+	const lines = getLines(component)
+	const header = getHeaderContent(component)
+	const padding = getPadding(component)
 
-	return { lines, title, innerWidth, padding }
+	return { id, lines, header, padding }
 
-	function getLines(container: Element) {
-		const section = container.getElementsByTagName('section')[0]
+	function getId(component: Element) {
+		return Number.parseInt(component.id, 10)
+	}
+
+	function getLines(component: Element) {
+		const section = component.getElementsByTagName('section')[0]
 		const children = Array.from(section.children)
 
 		return children.map(child => child.textContent!.trim())
 	}
 
-	function getTitle(container: Element) {
-		const header = container.getElementsByTagName('header')[0]
-		if (!header) return ''
+	function getHeaderContent(component: Element) {
+		const headerElement = component.getElementsByTagName('header')[0]
+		if (!headerElement) return ''
 
-		return header.textContent!.trim()
+		return headerElement.textContent!.trim()
 	}
 
-	function getInnerWidth(lines: string[]) {
-		let innerWidth = 0
-
-		for (const line of lines) {
-			innerWidth = Math.max(innerWidth, line.length)
-		}
-
-		return innerWidth
-	}
-
-	function getPadding(container: Element) {
-		const defaults: Spacing = { top: 0, right: 1, bottom: 0, left: 1 }
-		let padding: Partial<Spacing>
+	function getPadding(component: Element) {
+		let padding: number[] = []
 
 		try {
-			let paddingAttr = container.getAttribute('data-padding')
-			// Add quotes to properties to be JSON.parse compliant
-			paddingAttr = paddingAttr!.replace(/([a-zA-Z]+)\s*:/g, '"$1":')
-			padding = JSON.parse(paddingAttr) || {}
+			let paddingAttr = component.getAttribute('data-padding')!
+			padding = JSON.parse(paddingAttr) || []
 		} catch (error) {
 			if (error instanceof SyntaxError) console.error('Bad data-padding format')
-			padding = {}
 		}
 
-		return Object.assign(defaults, padding) as Spacing
-	}
-}
+		if (padding.length === 0) padding.push(1, 0)
+		if (padding.length === 1) padding.push(0)
 
-function makeHorizontalBar(
-	middleWidth: number,
-	{ start, middle, end }: { start: string; middle: string; end: string }
-) {
-	const middleFill = middle.repeat(middleWidth)
-	return start + middleFill + end
+		return padding as [number, number]
+	}
 }

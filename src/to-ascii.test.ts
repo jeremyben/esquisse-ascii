@@ -1,9 +1,9 @@
-import { unicodeSingleMap } from './characters-maps'
+import { charMaps } from './characters-maps'
 import { toAscii } from './to-ascii'
 
 test('Simple html without header', () => {
 	document.body.innerHTML = `
-		<div class="card" data-padding='{}'>
+		<div class="card" id="1" data-padding="[]">
 			<section class="card-body">
 				<p>Hello <b>Boy</b></p>
 				<p>Yolo</p>
@@ -12,7 +12,7 @@ test('Simple html without header', () => {
 	`
 	const card = document.querySelector('.card')
 
-	const ascii = toAscii(card!, unicodeSingleMap)
+	const ascii = toAscii(card!, charMaps.unicodeSingle)
 
 	// prettier-ignore
 	const expected = [
@@ -27,7 +27,7 @@ test('Simple html without header', () => {
 
 test('Simple html with header', () => {
 	document.body.innerHTML = `
-		<div class="card">
+		<div class="card" id="1">
 			<header class="card-header">Titles</header>
 			<section class="card-body">
 				<p>Hello <b>Boy</b></p>
@@ -37,7 +37,7 @@ test('Simple html with header', () => {
 	`
 	const card = document.querySelector('.card')
 
-	const ascii = toAscii(card!, unicodeSingleMap)
+	const ascii = toAscii(card!, charMaps.unicodeSingle)
 
 	const expected = [
 		'┌───────────┐',
@@ -53,7 +53,7 @@ test('Simple html with header', () => {
 
 test('Simple html with custom padding', () => {
 	document.body.innerHTML = `
-		<div class="card" data-padding="{top: 1, bottom: 1, left: 4, right: 4}">
+		<div class="card" id="1" data-padding="[4, 1]">
 			<section class="card-body">
 				<p>Hello <b>Boy</b></p>
 				<p>Yolo</p>
@@ -62,7 +62,7 @@ test('Simple html with custom padding', () => {
 	`
 	const card = document.querySelector('.card')
 
-	const ascii = toAscii(card!, unicodeSingleMap)
+	const ascii = toAscii(card!, charMaps.unicodeSingle)
 
 	const expected = [
 		'┌─────────────────┐',
