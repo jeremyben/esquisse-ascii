@@ -9,11 +9,19 @@
 	"scripts": {
 		"start": "parcel src/index.html",
 		"build": "parcel build src/index.html",
-		"test": "jest --watchAll"
+		"test": "jest --watchAll --verbose false"
 	},
 	"jest": {
 		"preset": "ts-jest",
-		"testEnvironment": "jsdom"
+		"testEnvironment": "jsdom",
+		"setupTestFrameworkScriptFile": "<rootDir>/jest-matchers.ts",
+		"globals": {
+			"ts-jest": {
+				"diagnostics": {
+					"warnOnly": true
+				}
+			}
+		}
 	},
 	"dependencies": {},
 	"devDependencies": {
