@@ -1,5 +1,5 @@
-import { toAscii } from './to-ascii'
-import { toHtml } from './to-html'
+import { toAscii } from './html-to-ascii/to-ascii'
+import { toHtml } from './ascii-to-html/to-html'
 
 const toggleBtn = document.querySelector('#toggle')!
 

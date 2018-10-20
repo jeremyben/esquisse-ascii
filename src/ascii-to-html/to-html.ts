@@ -1,5 +1,5 @@
-import { getMaxLength, makeElementFromString } from './utils'
-import { guessCharMap } from './characters-maps'
+import { getMaxLength, makeElementFromString } from '../utils'
+import { guessCharMap } from '../characters-maps'
 
 /**
  * Get HTML from ascii text
@@ -60,7 +60,8 @@ function parseAsciiText(asciiText: string): BlockData[] {
 
 		// Top Bar
 		while ((res = topRegex.exec(row)) != null) {
-			// console.log(res.index, res[0], topRegex.lastIndex)
+			// console.log(res.index, res[0], topRegex.lastIndex, 'Y:', rowIndex)
+
 			blocks.push({
 				id: id++,
 				lines: [],

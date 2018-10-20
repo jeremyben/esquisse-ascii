@@ -1,5 +1,5 @@
-import { getMaxLength } from './utils'
-import { getCharMapFromRef } from './characters-maps'
+import { getMaxLength } from '../utils'
+import { getCharMapFromRef } from '../characters-maps'
 
 /**
  * get ascii text from HTML element

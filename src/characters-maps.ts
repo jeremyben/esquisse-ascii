@@ -42,20 +42,6 @@ export const charMaps: CharMap[] = [
 		junctionMiddle: '╬'
 	},
 	{
-		ref: 'ascii-single',
-		horizontal: '-',
-		vertical: '|',
-		topLeft: '+',
-		topRight: '+',
-		bottomLeft: '+',
-		bottomRight: '+',
-		junctionLeft: '+',
-		junctionRight: '+',
-		junctionTop: '+',
-		junctionBottom: '+',
-		junctionMiddle: '+'
-	},
-	{
 		ref: 'ascii-rounded',
 		horizontal: '-',
 		vertical: '|',
@@ -68,20 +54,6 @@ export const charMaps: CharMap[] = [
 		junctionTop: '+',
 		junctionBottom: '+',
 		junctionMiddle: '+'
-	},
-	{
-		ref: 'ascii-double',
-		horizontal: '=',
-		vertical: '|',
-		topLeft: '#',
-		topRight: '#',
-		bottomLeft: '#',
-		bottomRight: '#',
-		junctionLeft: '#',
-		junctionRight: '#',
-		junctionTop: '#',
-		junctionBottom: '#',
-		junctionMiddle: '#'
 	}
 ]
 

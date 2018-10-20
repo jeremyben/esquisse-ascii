@@ -2,7 +2,7 @@
  * Ascii characters map
  */
 declare interface CharMap {
-	ref: 'unicode-single' | 'unicode-rounded' | 'unicode-double' | 'ascii-single' | 'ascii-rounded' | 'ascii-double'
+	ref: 'unicode-single' | 'unicode-rounded' | 'unicode-double' | 'ascii-rounded'
 	horizontal: string
 	vertical: string
 	topLeft: string
