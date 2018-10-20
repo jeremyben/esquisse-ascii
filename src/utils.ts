@@ -9,7 +9,12 @@ export function getMaxLength(strings: string[]) {
  * Convert HTML string to HTML element.
  */
 export function makeElementFromString(htmlString: string) {
-	const wrapper = document.createElement('div')
-	wrapper.insertAdjacentHTML('afterbegin', htmlString)
-	return wrapper.firstElementChild!
+	// const wrapper = document.createElement('div')
+	// wrapper.insertAdjacentHTML('afterbegin', htmlString)
+	// return wrapper.firstElementChild!
+
+	// https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment
+	const wrapper = document.createElement('template')
+	wrapper.innerHTML = htmlString
+	return wrapper.content.firstElementChild!
 }

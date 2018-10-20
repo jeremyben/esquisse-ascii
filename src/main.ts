@@ -1,11 +1,19 @@
 import { toAscii } from './to-ascii'
-import { charMaps } from './characters-maps'
+import { toHtml } from './to-html'
 
-const goBtn = document.querySelector('#go')!
+const toggleBtn = document.querySelector('#toggle')!
 
-goBtn.addEventListener('click', function() {
-	const htmlContainer = document.querySelector('#html')!
+toggleBtn.addEventListener('click', function() {
+	const htmlContainer = document.querySelector('#container')!
 	const asciiContainer = document.querySelector('#ascii')!
-	const ascii = toAscii(htmlContainer, charMaps.unicodeSingle)
-	asciiContainer.insertAdjacentHTML('afterbegin', ascii)
+
+	if (!asciiContainer.textContent && htmlContainer.innerHTML) {
+		const ascii = toAscii(htmlContainer)
+		asciiContainer.textContent = ascii
+		htmlContainer.innerHTML = ''
+	} else {
+		const newHtmlContainer = toHtml(asciiContainer.textContent!)
+		htmlContainer.parentNode!.replaceChild(newHtmlContainer, htmlContainer)
+		asciiContainer.textContent = ''
+	}
 })

@@ -7,21 +7,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"/>
 	<style>
+		.card { display: inline-block }
 		.card-body p { margin-bottom: 0 }
 	</style>
 </head>
 <body>
 	<div class="container">
 
-		<div id="html" class="card d-inline-block" data-padding="{right: 2, left: 2}">
-			<header class="card-header">Title</header>
-			<section class="card-body">
-				<p>Hello <b>Boy</b></p>
-				<p>Yolo</p>
-			</section>
-		</div>
+		<div><button class="btn btn-primary my-4 px-4" id="toggle">Toggle</button></div>
 
-		<div><button class="btn btn-primary my-4 px-4" id="go">Go</button></div>
+		<div id="container">
+			<div class="card" data-padding="[2, 2]" data-charmap="ascii-rounded">
+				<header class="card-header">Esquisse</header>
+				<section class="card-body">
+					<p>Hello Boy</p>
+					<p>Yolo</p>
+				</section>
+			</div>
+		</div>
 
 		<pre id="ascii"></pre>
 

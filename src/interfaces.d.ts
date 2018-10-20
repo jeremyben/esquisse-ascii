@@ -2,6 +2,7 @@
  * Ascii characters map
  */
 declare interface CharMap {
+	ref: 'unicode-single' | 'unicode-rounded' | 'unicode-double' | 'ascii-single' | 'ascii-rounded' | 'ascii-double'
 	horizontal: string
 	vertical: string
 	topLeft: string
@@ -22,7 +23,8 @@ declare interface BlockData {
 	id: number
 	lines: string[]
 	header: string
-	padding: [number, number] // X Y
+	padding: [number, number] // X Y,
+	charMapRef: CharMap['ref']
 	topLeftLocation?: [number, number] // X Y
 	bottomRightLocation?: [number, number] // X Y
 }

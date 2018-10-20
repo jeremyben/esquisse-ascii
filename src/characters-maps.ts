@@ -1,92 +1,111 @@
-const unicodeSingle: CharMap = {
-	horizontal: '─',
-	vertical: '│',
-	topLeft: '┌',
-	topRight: '┐',
-	bottomLeft: '└',
-	bottomRight: '┘',
-	junctionLeft: '├',
-	junctionRight: '┤',
-	junctionTop: '┬',
-	junctionBottom: '┴',
-	junctionMiddle: '┼'
-}
+export const charMaps: CharMap[] = [
+	{
+		ref: 'unicode-single',
+		horizontal: '─',
+		vertical: '│',
+		topLeft: '┌',
+		topRight: '┐',
+		bottomLeft: '└',
+		bottomRight: '┘',
+		junctionLeft: '├',
+		junctionRight: '┤',
+		junctionTop: '┬',
+		junctionBottom: '┴',
+		junctionMiddle: '┼'
+	},
+	{
+		ref: 'unicode-rounded',
+		horizontal: '─',
+		vertical: '│',
+		topLeft: '╭',
+		topRight: '╮',
+		bottomLeft: '╰',
+		bottomRight: '╯',
+		junctionLeft: '├',
+		junctionRight: '┤',
+		junctionTop: '┬',
+		junctionBottom: '┴',
+		junctionMiddle: '┼'
+	},
+	{
+		ref: 'unicode-double',
+		horizontal: '═',
+		vertical: '║',
+		topLeft: '╔',
+		topRight: '╗',
+		bottomLeft: '╚',
+		bottomRight: '╝',
+		junctionLeft: '╠',
+		junctionRight: '╣',
+		junctionTop: '╦',
+		junctionBottom: '╩',
+		junctionMiddle: '╬'
+	},
+	{
+		ref: 'ascii-single',
+		horizontal: '-',
+		vertical: '|',
+		topLeft: '+',
+		topRight: '+',
+		bottomLeft: '+',
+		bottomRight: '+',
+		junctionLeft: '+',
+		junctionRight: '+',
+		junctionTop: '+',
+		junctionBottom: '+',
+		junctionMiddle: '+'
+	},
+	{
+		ref: 'ascii-rounded',
+		horizontal: '-',
+		vertical: '|',
+		topLeft: '.',
+		topRight: '.',
+		bottomLeft: "'",
+		bottomRight: "'",
+		junctionLeft: ':',
+		junctionRight: ':',
+		junctionTop: '+',
+		junctionBottom: '+',
+		junctionMiddle: '+'
+	},
+	{
+		ref: 'ascii-double',
+		horizontal: '=',
+		vertical: '|',
+		topLeft: '#',
+		topRight: '#',
+		bottomLeft: '#',
+		bottomRight: '#',
+		junctionLeft: '#',
+		junctionRight: '#',
+		junctionTop: '#',
+		junctionBottom: '#',
+		junctionMiddle: '#'
+	}
+]
 
-const unicodeRounded: CharMap = {
-	horizontal: '─',
-	vertical: '│',
-	topLeft: '╭',
-	topRight: '╮',
-	bottomLeft: '╰',
-	bottomRight: '╯',
-	junctionLeft: '├',
-	junctionRight: '┤',
-	junctionTop: '┬',
-	junctionBottom: '┴',
-	junctionMiddle: '┼'
-}
+/**
+ * Get unicode-single by default.
+ */
+export function getCharMapFromRef(ref: CharMap['ref']): CharMap {
+	if (!ref) return charMaps[0]
 
-const unicodeDouble: CharMap = {
-	horizontal: '═',
-	vertical: '║',
-	topLeft: '╔',
-	topRight: '╗',
-	bottomLeft: '╚',
-	bottomRight: '╝',
-	junctionLeft: '╠',
-	junctionRight: '╣',
-	junctionTop: '╦',
-	junctionBottom: '╩',
-	junctionMiddle: '╬'
-}
+	const found = charMaps.find(charMap => charMap.ref === ref)
 
-const asciiSingle: CharMap = {
-	horizontal: '-',
-	vertical: '|',
-	topLeft: '+',
-	topRight: '+',
-	bottomLeft: '+',
-	bottomRight: '+',
-	junctionLeft: '+',
-	junctionRight: '+',
-	junctionTop: '+',
-	junctionBottom: '+',
-	junctionMiddle: '+'
-}
+	if (!found) {
+		console.warn('Bad CharMap reference in one of your components, using default')
+		return charMaps[0]
+	}
 
-const asciiRounded: CharMap = {
-	horizontal: '-',
-	vertical: '|',
-	topLeft: '.',
-	topRight: '.',
-	bottomLeft: "'",
-	bottomRight: "'",
-	junctionLeft: ':',
-	junctionRight: ':',
-	junctionTop: '+',
-	junctionBottom: '+',
-	junctionMiddle: '+'
-}
-
-export const charMaps = {
-	unicodeSingle,
-	unicodeRounded,
-	unicodeDouble,
-	asciiSingle,
-	asciiRounded
+	return found
 }
 
 /**
  * Naive implementation of guessing characters map.
- * Based on top left character, since it's different in every map.
  */
-export function guessCharMap(ascii: string): CharMap {
-	let charMap
-
-	for (const key of Object.keys(charMaps)) {
-		if (ascii.indexOf(charMaps[key].topLeft) > -1) charMap = charMaps[key]
-		else charMap = unicodeSingle
-	}
-
-	return charMap as CharMap
+export function guessCharMap(asciiText: string): CharMap {
+	const guessed = charMaps.find(charMap => asciiText.includes(charMap.topLeft + charMap.horizontal))
+	if (!guessed) throw new Error('Impossible to guess the characters map')
+	return guessed
 }

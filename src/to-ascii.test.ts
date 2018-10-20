@@ -1,18 +1,25 @@
-import { charMaps } from './characters-maps'
 import { toAscii } from './to-ascii'
 
-test('Simple html without header', () => {
+beforeEach(() => {
+	jest.restoreAllMocks()
+})
+
+test('Card without data attributes', () => {
+	const warnSpy = jest.spyOn(console, 'warn')
 	document.body.innerHTML = `
-		<div class="card" id="1" data-padding="[]">
-			<section class="card-body">
-				<p>Hello <b>Boy</b></p>
-				<p>Yolo</p>
-			</section>
+		<div id="container">
+			<div class="card" id="1">
+				<section class="card-body">
+					<p>Hello <b>Boy</b></p>
+					<p>Yolo</p>
+				</section>
+			</div>
 		</div>
 	`
-	const card = document.querySelector('.card')
 
-	const ascii = toAscii(card!, charMaps.unicodeSingle)
+	const container = document.querySelector('#container')!
+	const ascii = toAscii(container)
+	expect(warnSpy).toHaveBeenCalled()
 
 	// prettier-ignore
 	const expected = [
@@ -25,19 +32,23 @@ test('Simple html without header', () => {
 	expect(ascii).toBe(expected)
 })
 
-test('Simple html with header', () => {
+test('Card with header and empty or wrong data attributes', () => {
+	const warnSpy = jest.spyOn(console, 'warn')
 	document.body.innerHTML = `
-		<div class="card" id="1">
-			<header class="card-header">Titles</header>
-			<section class="card-body">
-				<p>Hello <b>Boy</b></p>
-				<p>Yolo</p>
-			</section>
+		<div id="container">
+			<div class="card" id="1" data-padding="[a,e]" data-charmap="comic-sans">
+				<header class="card-header">Titles</header>
+				<section class="card-body">
+					<p>Hello <b>Boy</b></p>
+					<p>Yolo</p>
+				</section>
+			</div>
 		</div>
 	`
-	const card = document.querySelector('.card')
 
-	const ascii = toAscii(card!, charMaps.unicodeSingle)
+	const container = document.querySelector('#container')!
+	const ascii = toAscii(container)
+	expect(warnSpy).toHaveBeenCalledTimes(2)
 
 	const expected = [
 		'┌───────────┐',
@@ -51,26 +62,30 @@ test('Simple html with header', () => {
 	expect(ascii).toBe(expected)
 })
 
-test('Simple html with custom padding', () => {
+test('Card with custom padding and charmap', () => {
+	const warnSpy = jest.spyOn(console, 'warn')
 	document.body.innerHTML = `
-		<div class="card" id="1" data-padding="[4, 1]">
-			<section class="card-body">
-				<p>Hello <b>Boy</b></p>
-				<p>Yolo</p>
-			</section>
+		<div id="container">
+			<div class="card" id="1" data-padding="[4, 1]" data-charmap="unicode-double">
+				<section class="card-body">
+					<p>Hello <b>Boy</b></p>
+					<p>Yolo</p>
+				</section>
+			</div>
 		</div>
 	`
-	const card = document.querySelector('.card')
 
-	const ascii = toAscii(card!, charMaps.unicodeSingle)
+	const container = document.querySelector('#container')!
+	const ascii = toAscii(container)
+	expect(warnSpy).not.toHaveBeenCalled()
 
 	const expected = [
-		'┌─────────────────┐',
-		'│                 │',
-		'│    Hello Boy    │',
-		'│    Yolo         │',
-		'│                 │',
-		'└─────────────────┘'
+		'╔═════════════════╗',
+		'║                 ║',
+		'║    Hello Boy    ║',
+		'║    Yolo         ║',
+		'║                 ║',
+		'╚═════════════════╝'
 	].join('\n')
 
 	expect(ascii).toBe(expected)

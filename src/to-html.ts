@@ -9,6 +9,7 @@ export function toHtml(ascii: string): Element {
 	const elements = blocks.map(makeHtmlComponent)
 
 	const container = document.createElement('div')
+	container.id = 'container'
 	container.append(...elements)
 
 	return container
@@ -18,10 +19,10 @@ export function toHtml(ascii: string): Element {
  * Get HTML from block metadata
  */
 function makeHtmlComponent(block: BlockData): Element {
-	const { id, lines, header, padding } = block
+	const { id, lines, header, padding, charMapRef } = block
 	const [paddingX, paddingY] = padding
 
-	let html = `<div class="card" id="${id}" data-padding="[${paddingX}, ${paddingY}]">`
+	let html = `<div class="card" id="${id}" data-padding="[${paddingX}, ${paddingY}]" data-charmap="${charMapRef}">`
 
 	if (header) {
 		html += `<header class="card-header">${header}</header>`
@@ -40,13 +41,13 @@ function makeHtmlComponent(block: BlockData): Element {
 }
 
 /**
- * Get all blocks metadata from ascii text
+ * Get all blocks metadata from ascii text.
+ * Naive Regex implmentation. TODO: Use a real parser.
  */
-function parseAsciiText(ascii: string): BlockData[] {
-	const charMap = guessCharMap(ascii)
-
+function parseAsciiText(asciiText: string): BlockData[] {
+	const charMap = guessCharMap(asciiText)
 	const { topRegex, bottomRegex, wordRegex, junctionRegex } = makeParsingRegexes(charMap)
-	const rows = ascii.split('\n')
+	const rows = asciiText.split('\n')
 	const blocks: BlockData[] = []
 
 	// TODO: Measure performance : for loop for speed ?
@@ -64,7 +65,8 @@ function parseAsciiText(ascii: string): BlockData[] {
 				lines: [],
 				header: '',
 				padding: [0, 0],
-				topLeftLocation: [res.index, rowIndex]
+				topLeftLocation: [res.index, rowIndex],
+				charMapRef: charMap.ref
 			})
 		}
 
@@ -99,7 +101,7 @@ function parseAsciiText(ascii: string): BlockData[] {
 
 		// Remove lines for padding Y
 		block.lines.splice(0, block.padding[1])
-		block.lines.splice(-1, block.padding[1])
+		block.lines.splice(-block.padding[1], block.padding[1])
 	})
 
 	return blocks
@@ -107,10 +109,10 @@ function parseAsciiText(ascii: string): BlockData[] {
 	function makeParsingRegexes(charMap: CharMap) {
 		const { horizontal, vertical, junctionLeft, junctionRight, topLeft, topRight, bottomLeft, bottomRight } = charMap
 
-		const topRegex = new RegExp(`${topLeft + horizontal}+${topRight}`, 'g')
-		const junctionRegex = new RegExp(`${junctionLeft + horizontal}+${junctionRight}`, 'g')
-		const bottomRegex = new RegExp(`${bottomLeft + horizontal}+${bottomRight}`, 'g')
-		const wordRegex = new RegExp(`(?<=${vertical}) ([^${vertical}]*) (?=${vertical})`, 'g')
+		const topRegex = new RegExp(`\\${topLeft}\\${horizontal}+\\${topRight}`, 'g')
+		const junctionRegex = new RegExp(`\\${junctionLeft}\\${horizontal}+\\${junctionRight}`, 'g')
+		const bottomRegex = new RegExp(`\\${bottomLeft}\\${horizontal}+\\${bottomRight}`, 'g')
+		const wordRegex = new RegExp(`(?<=\\${vertical}) ([^\\${vertical}]*) (?=\\${vertical})`, 'g')
 
 		return { topRegex, junctionRegex, bottomRegex, wordRegex }
 	}

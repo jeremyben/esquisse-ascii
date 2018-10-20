@@ -1,5 +1,25 @@
 import { toHtml } from './to-html'
 
+test('Single ascii component with padding', () => {
+	const ascii = [
+		'.-------------.',
+		'|  Esquisse   |',
+		':-------------:',
+		'|             |',
+		'|             |',
+		'|  Hello Boy  |',
+		'|  Yolo       |',
+		'|             |',
+		'|             |',
+		"'-------------'"
+	].join('\n')
+
+	const container = toHtml(ascii)
+	expect(container.id).toBe('container')
+	console.log('container', container.innerHTML)
+	expect(container.children).toHaveLength(1)
+})
+
 test('Ascii text to multiple components', () => {
 	const ascii = [
 		'                     ┌────┐        ',
@@ -15,6 +35,8 @@ test('Ascii text to multiple components', () => {
 	].join('\n')
 
 	const container = toHtml(ascii)
+	expect(container.id).toBe('container')
+	// console.log('container', container.innerHTML)
 
 	expect(container.children).toHaveLength(3)
 	const firstElt = container.children[0]

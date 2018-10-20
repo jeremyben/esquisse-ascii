@@ -1,21 +1,29 @@
 import { getMaxLength } from './utils'
+import { getCharMapFromRef } from './characters-maps'
 
 /**
  * get ascii text from HTML element
  */
-export function toAscii(element: Element, charMap: CharMap): string {
-	const block = parseHtmlComponent(element)
-	const ascii = makeAsciiComponent(block, charMap)
+export function toAscii(container: Element): string {
+	const components = Array.from(container.children)
+	const blocks = components.map(parseHtmlComponent)
+
+	let ascii = ''
+	for (const block of blocks) {
+		ascii += makeAsciiComponent(block)
+	}
+
 	return ascii
 }
 
 /**
  * Get ascii text from block metadata
  */
-function makeAsciiComponent(block: BlockData, charMap: CharMap): string {
-	const { lines, header, padding } = block
+function makeAsciiComponent(block: BlockData): string {
+	const { lines, header, padding, charMapRef } = block
 	const [paddingX, paddingY] = padding
 	const innerWidth = getMaxLength([...lines, header])
+	const charMap = getCharMapFromRef(charMapRef)
 
 	let ascii = makeTopBar(true)
 
@@ -111,8 +119,9 @@ function parseHtmlComponent(component: Element): BlockData {
 	const lines = getLines(component)
 	const header = getHeaderContent(component)
 	const padding = getPadding(component)
+	const charMapRef = getCharMapRef(component)
 
-	return { id, lines, header, padding }
+	return { id, lines, header, padding, charMapRef }
 
 	function getId(component: Element) {
 		return Number.parseInt(component.id, 10)
@@ -139,12 +148,24 @@ function parseHtmlComponent(component: Element): BlockData {
 			let paddingAttr = component.getAttribute('data-padding')!
 			padding = JSON.parse(paddingAttr) || []
 		} catch (error) {
-			if (error instanceof SyntaxError) console.error('Bad data-padding format')
+			if (error instanceof SyntaxError) {
+				console.warn(`Bad padding format on component ${component.id}, using default`)
+			}
 		}
 
 		if (padding.length === 0) padding.push(1, 0)
 		if (padding.length === 1) padding.push(0)
 
 		return padding as [number, number]
+	}
+
+	function getCharMapRef(component: Element) {
+		const charMapRef = component.getAttribute('data-charmap')
+
+		if (!charMapRef) {
+			console.warn(`Component ${component.id} doesn't have charMap reference, using default`)
+		}
+
+		return charMapRef as CharMap['ref']
 	}
 }
