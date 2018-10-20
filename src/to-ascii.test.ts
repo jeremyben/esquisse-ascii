@@ -9,10 +9,10 @@ test('Card without data attributes', () => {
 	document.body.innerHTML = `
 		<div id="container">
 			<div class="card" id="1">
-				<section class="card-body">
+				<div class="card-body">
 					<p>Hello <b>Boy</b></p>
 					<p>Yolo</p>
-				</section>
+				</div>
 			</div>
 		</div>
 	`
@@ -37,11 +37,11 @@ test('Card with header and empty or wrong data attributes', () => {
 	document.body.innerHTML = `
 		<div id="container">
 			<div class="card" id="1" data-padding="[a,e]" data-charmap="comic-sans">
-				<header class="card-header">Titles</header>
-				<section class="card-body">
+				<div class="card-header">Titles</div>
+				<div class="card-body">
 					<p>Hello <b>Boy</b></p>
 					<p>Yolo</p>
-				</section>
+				</div>
 			</div>
 		</div>
 	`
@@ -67,10 +67,10 @@ test('Card with custom padding and charmap', () => {
 	document.body.innerHTML = `
 		<div id="container">
 			<div class="card" id="1" data-padding="[4, 1]" data-charmap="unicode-double">
-				<section class="card-body">
+				<div class="card-body">
 					<p>Hello <b>Boy</b></p>
 					<p>Yolo</p>
-				</section>
+				</div>
 			</div>
 		</div>
 	`

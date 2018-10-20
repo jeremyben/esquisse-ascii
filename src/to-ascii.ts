@@ -128,14 +128,14 @@ function parseHtmlComponent(component: Element): BlockData {
 	}
 
 	function getLines(component: Element) {
-		const section = component.getElementsByTagName('section')[0]
+		const section = component.getElementsByClassName('card-body')[0]
 		const children = Array.from(section.children)
 
 		return children.map(child => child.textContent!.trim())
 	}
 
 	function getHeaderContent(component: Element) {
-		const headerElement = component.getElementsByTagName('header')[0]
+		const headerElement = component.getElementsByClassName('card-header')[0]
 		if (!headerElement) return ''
 
 		return headerElement.textContent!.trim()

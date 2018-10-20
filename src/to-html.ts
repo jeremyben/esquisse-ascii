@@ -21,19 +21,20 @@ export function toHtml(ascii: string): Element {
 function makeHtmlComponent(block: BlockData): Element {
 	const { id, lines, header, padding, charMapRef } = block
 	const [paddingX, paddingY] = padding
+	const paddingStyle = `${paddingY + 0.75}rem ${paddingX / 2 + 0.25}rem`
 
 	let html = `<div class="card" id="${id}" data-padding="[${paddingX}, ${paddingY}]" data-charmap="${charMapRef}">`
 
 	if (header) {
-		html += `<header class="card-header">${header}</header>`
+		html += `<div class="card-header">${header}</div>`
 	}
 
-	html += `<section class="card-body">`
+	html += `<div class="card-body" style="padding:${paddingStyle}">`
 	for (const line of lines) {
 		html += `<p>${line}</p>`
 	}
 
-	html += `</section></div>`
+	html += `</div></div>`
 
 	const component = makeElementFromString(html)
 
@@ -112,7 +113,7 @@ function parseAsciiText(asciiText: string): BlockData[] {
 		const topRegex = new RegExp(`\\${topLeft}\\${horizontal}+\\${topRight}`, 'g')
 		const junctionRegex = new RegExp(`\\${junctionLeft}\\${horizontal}+\\${junctionRight}`, 'g')
 		const bottomRegex = new RegExp(`\\${bottomLeft}\\${horizontal}+\\${bottomRight}`, 'g')
-		const wordRegex = new RegExp(`(?<=\\${vertical}) ([^\\${vertical}]*) (?=\\${vertical})`, 'g')
+		const wordRegex = new RegExp(`(?<=\\${vertical}) ?([^\\${vertical}]*) ?(?=\\${vertical})`, 'g')
 
 		return { topRegex, junctionRegex, bottomRegex, wordRegex }
 	}
