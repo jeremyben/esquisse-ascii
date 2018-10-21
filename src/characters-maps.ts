@@ -42,6 +42,20 @@ export const charMaps: CharMap[] = [
 		junctionMiddle: '╬'
 	},
 	{
+		ref: 'unicode-heavy',
+		horizontal: '━',
+		vertical: '┃',
+		topLeft: '┏',
+		topRight: '┓',
+		bottomLeft: '┗',
+		bottomRight: '┛',
+		junctionLeft: '┣',
+		junctionRight: '┫',
+		junctionTop: '┳',
+		junctionBottom: '┻',
+		junctionMiddle: '╋'
+	},
+	{
 		ref: 'ascii-rounded',
 		horizontal: '-',
 		vertical: '|',
@@ -61,8 +75,6 @@ export const charMaps: CharMap[] = [
  * Get unicode-single by default.
  */
 export function getCharMapFromRef(ref: CharMap['ref']): CharMap {
-	if (!ref) return charMaps[0]
-
 	const found = charMaps.find(charMap => charMap.ref === ref)
 
 	if (!found) {
@@ -78,6 +90,8 @@ export function getCharMapFromRef(ref: CharMap['ref']): CharMap {
  */
 export function guessCharMap(asciiText: string): CharMap {
 	const guessed = charMaps.find(charMap => asciiText.includes(charMap.topLeft + charMap.horizontal))
+
 	if (!guessed) throw new Error('Impossible to guess the characters map')
+
 	return guessed
 }

@@ -9,8 +9,8 @@ describe('Simple HTML components', () => {
 		const warnSpy = jest.spyOn(console, 'warn')
 		document.body.innerHTML = `
 			<div id="container">
-				<div class="card" id="1" data-charmap="unicode-single">
-					<div class="card-body">
+				<div class="card unicode-single" id="1">
+					<div class="card-body" style="padding: 0.75rem 0.75rem">
 						<p>Hello Boy</p>
 						<p>Yolo</p>
 					</div>
@@ -37,7 +37,7 @@ describe('Simple HTML components', () => {
 		const warnSpy = jest.spyOn(console, 'warn')
 		document.body.innerHTML = `
 			<div id="container">
-				<div class="card" id="1" data-padding="[a,e]" data-charmap="">
+				<div class="card" id="1">
 					<div class="card-header">Titles</div>
 					<div class="card-body">
 						<p>Hello Boy</p>
@@ -67,8 +67,8 @@ describe('Simple HTML components', () => {
 		const warnSpy = jest.spyOn(console, 'warn')
 		document.body.innerHTML = `
 			<div id="container">
-				<div class="card" id="1" data-padding="[4, 1]" data-charmap="unicode-double">
-					<div class="card-body">
+				<div class="card unicode-double" id="1">
+					<div class="card-body" style="padding: 1.75rem 2.25rem">
 						<p>Hello Boy</p>
 						<p>Yolo</p>
 					</div>

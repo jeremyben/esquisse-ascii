@@ -1,4 +1,4 @@
-import { getMaxLength } from '../utils'
+import { getMaxLength, convertPadding } from '../utils'
 import { getCharMapFromRef } from '../characters-maps'
 
 /**
@@ -128,8 +128,8 @@ function parseHtmlComponent(component: Element): BlockData {
 	}
 
 	function getLines(component: Element) {
-		const section = component.getElementsByClassName('card-body')[0]
-		const children = Array.from(section.children)
+		const cardBody = component.getElementsByClassName('card-body')[0]
+		const children = Array.from(cardBody.children)
 
 		return children.map(child => child.textContent!.trim())
 	}
@@ -141,29 +141,28 @@ function parseHtmlComponent(component: Element): BlockData {
 		return headerElement.textContent!.trim()
 	}
 
-	function getPadding(component: Element) {
-		let padding: number[] = []
+	function getPadding(component: Element): BlockData['padding'] {
+		const cardBody = component.getElementsByClassName('card-body')[0]
+		const styleAttr = cardBody.getAttribute('style')
 
-		try {
-			let paddingAttr = component.getAttribute('data-padding')!
-			padding = JSON.parse(paddingAttr) || []
-		} catch (error) {
-			if (error instanceof SyntaxError) {
-				console.warn(`Bad padding format on component ${component.id}, using default`)
-			}
+		if (!styleAttr || !styleAttr.includes('padding')) {
+			console.warn(`No padding on component ${component.id}, using default`)
+
+			return [1, 0]
 		}
 
-		if (padding.length === 0) padding.push(1, 0)
-		if (padding.length === 1) padding.push(0)
-
-		return padding as [number, number]
+		// TODO: better parsing for multiple styles
+		const paddingStyle = styleAttr.replace(/padding: ?/, '')
+		return convertPadding(paddingStyle)
 	}
 
-	function getCharMapRef(component: Element) {
-		const charMapRef = component.getAttribute('data-charmap')
+	function getCharMapRef(component: Element): CharMap['ref'] {
+		const charMapRef = component.classList.item(1)
 
 		if (!charMapRef) {
 			console.warn(`Component ${component.id} doesn't have charMap reference, using default`)
+
+			return 'unicode-single'
 		}
 
 		return charMapRef as CharMap['ref']

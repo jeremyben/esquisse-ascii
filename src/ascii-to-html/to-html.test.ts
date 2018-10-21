@@ -19,13 +19,14 @@ test('Single ascii component with padding', () => {
 	expect(container.children).toHaveLength(1)
 
 	const firstElt = container.children[0]
-	expect(firstElt.className).toBe('card')
+	expect(firstElt.className).toBe('card ascii-rounded')
 	expect(firstElt.id).toBe('1')
-	expect(firstElt.getAttribute('data-padding')).toBeOneOf('[2,2]', '[2, 2]')
-	expect(firstElt.getAttribute('data-charmap')).toBe('ascii-rounded')
 
-	const header = firstElt.firstElementChild!
+	const header = firstElt.children[0]
 	expect(header.className).toBe('card-header')
+
+	const firstEltBody = firstElt.children[1]
+	expect(getComputedStyle(firstEltBody).padding).toBe('2.75rem 1.25rem')
 })
 
 test('Ascii text to multiple components', () => {
@@ -49,7 +50,7 @@ test('Ascii text to multiple components', () => {
 	expect(container.children).toHaveLength(3)
 	const firstElt = container.children[0]
 	expect(firstElt.id).toBe('1')
-	expect(firstElt.className).toBe('card')
+	expect(firstElt.className).toBe('card unicode-single')
 
 	const secondElt = container.children[1]
 	expect(secondElt.id).toBe('2')
@@ -64,6 +65,7 @@ test('Ascii text to multiple components', () => {
 
 	const thirdElt = container.children[2]
 	expect(thirdElt.id).toBe('3')
-	expect(thirdElt.firstElementChild!.className).toBe('card-body')
-	expect(thirdElt.getAttribute('data-padding')).toBeOneOf('[2, 1]', '[2,1]')
+	const thirdEltBody = thirdElt.firstElementChild!
+	expect(thirdEltBody.className).toBe('card-body')
+	expect(getComputedStyle(thirdEltBody).padding).toBe('1.75rem 1.25rem')
 })

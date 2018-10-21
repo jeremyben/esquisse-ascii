@@ -1,4 +1,4 @@
-import { getMaxLength, makeElementFromString } from '../utils'
+import { getMaxLength, makeElementFromString, convertPadding } from '../utils'
 import { guessCharMap } from '../characters-maps'
 
 /**
@@ -20,10 +20,9 @@ export function toHtml(ascii: string): Element {
  */
 function makeHtmlComponent(block: BlockData): Element {
 	const { id, lines, header, padding, charMapRef } = block
-	const [paddingX, paddingY] = padding
-	const paddingStyle = `${paddingY + 0.75}rem ${paddingX / 2 + 0.25}rem`
+	const paddingStyle = convertPadding(padding)
 
-	let html = `<div class="card" id="${id}" data-padding="[${paddingX}, ${paddingY}]" data-charmap="${charMapRef}">`
+	let html = `<div class="card ${charMapRef}" id="${id}">`
 
 	if (header) {
 		html += `<div class="card-header">${header}</div>`
@@ -36,9 +35,7 @@ function makeHtmlComponent(block: BlockData): Element {
 
 	html += `</div></div>`
 
-	const component = makeElementFromString(html)
-
-	return component
+	return makeElementFromString(html)
 }
 
 /**

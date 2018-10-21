@@ -2,7 +2,7 @@
  * Ascii characters map
  */
 declare interface CharMap {
-	ref: 'unicode-single' | 'unicode-rounded' | 'unicode-double' | 'ascii-rounded'
+	ref: 'unicode-single' | 'unicode-rounded' | 'unicode-double' | 'unicode-heavy' | 'ascii-rounded'
 	horizontal: string
 	vertical: string
 	topLeft: string
@@ -27,4 +27,8 @@ declare interface BlockData {
 	charMapRef: CharMap['ref']
 	topLeftLocation?: [number, number] // X Y
 	bottomRightLocation?: [number, number] // X Y
+}
+
+declare interface HTMLInputEvent extends Event {
+	target: HTMLInputElement & EventTarget
 }
