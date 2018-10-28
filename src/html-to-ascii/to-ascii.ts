@@ -9,9 +9,10 @@ export function toAscii(container: Element): string {
 	const blocks = components.map(parseHtmlComponent)
 
 	let ascii = ''
-	for (const block of blocks) {
+	blocks.forEach((block, index) => {
 		ascii += makeAsciiComponent(block)
-	}
+		if (index < blocks.length - 1) ascii += '\n'
+	})
 
 	return ascii
 }
@@ -22,14 +23,15 @@ export function toAscii(container: Element): string {
 function makeAsciiComponent(block: BlockData): string {
 	const { lines, header, padding, charMapRef } = block
 	const [paddingX, paddingY] = padding
-	const innerWidth = getMaxLength([...lines, header])
+	const wordsMaxWidth = getMaxLength([...lines, header])
+	const innerWidth = wordsMaxWidth + paddingX * 2
 	const charMap = getCharMapFromRef(charMapRef)
 
-	let ascii = makeTopBar(true)
+	let ascii = makeBar('top', true)
 
 	if (header) {
 		ascii += makeTextRow(header, true, true)
-		ascii += makeSeparatorBar(true)
+		ascii += makeBar('separator', true)
 	}
 
 	ascii += makeTextRow('', true).repeat(paddingY)
@@ -39,75 +41,47 @@ function makeAsciiComponent(block: BlockData): string {
 	}
 
 	ascii += makeTextRow('', true).repeat(paddingY)
-	ascii += makeBottomBar()
+	ascii += makeBar('bottom')
 
 	return ascii
 
 	function makeTextRow(word: string, breakline = false, center = false) {
+		const { vertical } = charMap
 		const paddingFill = ' '.repeat(paddingX)
 
-		const remaining = innerWidth - word.length
+		const remainingWidth = wordsMaxWidth - word.length
 		let leftMiddleFill: string
 		let rightMiddleFill: string
 
 		if (center) {
-			leftMiddleFill = rightMiddleFill = ' '.repeat(Math.floor(remaining / 2))
-			if (remaining % 2 === 1) rightMiddleFill += ' '
+			leftMiddleFill = rightMiddleFill = ' '.repeat(Math.floor(remainingWidth / 2))
+			if (remainingWidth % 2 === 1) rightMiddleFill += ' '
 		} else {
 			leftMiddleFill = ''
-			rightMiddleFill = ' '.repeat(remaining)
+			rightMiddleFill = ' '.repeat(remainingWidth)
 		}
 
-		let wordRow =
-			charMap.vertical + paddingFill + leftMiddleFill + word + rightMiddleFill + paddingFill + charMap.vertical
+		let wordRow = vertical + paddingFill + leftMiddleFill + word + rightMiddleFill + paddingFill + vertical
 
 		if (breakline) wordRow += '\n'
 
 		return wordRow
 	}
 
-	function makeTopBar(breakline = false) {
-		const start = charMap.topLeft
-		const middle = charMap.horizontal
-		const end = charMap.topRight
-		const width = innerWidth + paddingX * 2
+	function makeBar(type: 'top' | 'separator' | 'bottom', breakline = false) {
+		const { horizontal, topLeft, topRight, junctionLeft, junctionRight, bottomLeft, bottomRight } = charMap
 
-		let topBar = makeHorizontalBar(width, { start, middle, end })
-		if (breakline) topBar += '\n'
+		const middleFill = horizontal.repeat(innerWidth)
 
-		return topBar
-	}
+		let bar = ''
 
-	function makeSeparatorBar(breakline = false) {
-		const start = charMap.junctionLeft
-		const middle = charMap.horizontal
-		const end = charMap.junctionRight
-		const width = innerWidth + paddingX * 2
+		if (type === 'top') bar = topLeft + middleFill + topRight
+		if (type === 'separator') bar = junctionLeft + middleFill + junctionRight
+		if (type === 'bottom') bar = bottomLeft + middleFill + bottomRight
 
-		let separatorBar = makeHorizontalBar(width, { start, middle, end })
-		if (breakline) separatorBar += '\n'
+		if (breakline) bar += '\n'
 
-		return separatorBar
-	}
-
-	function makeBottomBar(breakline = false) {
-		const start = charMap.bottomLeft
-		const middle = charMap.horizontal
-		const end = charMap.bottomRight
-		const width = innerWidth + paddingX * 2
-
-		let bottomBar = makeHorizontalBar(width, { start, middle, end })
-		if (breakline) bottomBar += '\n'
-
-		return bottomBar
-	}
-
-	function makeHorizontalBar(
-		middleWidth: number,
-		{ start, middle, end }: { start: string; middle: string; end: string }
-	) {
-		const middleFill = middle.repeat(middleWidth)
-		return start + middleFill + end
+		return bar
 	}
 }
 
@@ -147,7 +121,6 @@ function parseHtmlComponent(component: Element): BlockData {
 
 		if (!styleAttr || !styleAttr.includes('padding')) {
 			console.warn(`No padding on component ${component.id}, using default`)
-
 			return [1, 0]
 		}
 
@@ -157,14 +130,13 @@ function parseHtmlComponent(component: Element): BlockData {
 	}
 
 	function getCharMapRef(component: Element): CharMap['ref'] {
-		const charMapRef = component.classList.item(1)
+		const charMapRef = component.classList.item(1) as CharMap['ref']
 
 		if (!charMapRef) {
 			console.warn(`Component ${component.id} doesn't have charMap reference, using default`)
-
 			return 'unicode-single'
 		}
 
-		return charMapRef as CharMap['ref']
+		return charMapRef
 	}
 }

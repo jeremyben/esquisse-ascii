@@ -42,7 +42,9 @@ function makeHtmlComponent(block: BlockData): Element {
  * Get all blocks metadata from ascii text.
  * Naive Regex implmentation. TODO: Use a real parser.
  */
-function parseAsciiText(asciiText: string): BlockData[] {
+export function parseAsciiText(asciiText: string): BlockData[] {
+	if (!asciiText || !asciiText.trim()) return []
+
 	const charMap = guessCharMap(asciiText)
 	const { topRegex, bottomRegex, wordRegex, junctionRegex } = makeParsingRegexes(charMap)
 	const rows = asciiText.split('\n')

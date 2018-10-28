@@ -18,33 +18,43 @@ export function makeElementFromString(htmlString: string) {
 export function convertPadding(source: BlockData['padding']): string
 export function convertPadding(source: string): BlockData['padding']
 export function convertPadding(source: string | BlockData['padding']): string | BlockData['padding'] {
-	// calulations to match text whitespaces and browser spacing
+	// Constants and calulations to match text whitespaces and browser spacing
 	const extraY = 0.75
 	const extraX = 0.25
 
-	// From style attribute to blockdata
+	// From style property to blockdata
 	if (typeof source === 'string') {
 		const paddingRem = source.split(' ')
-		// Must have padding shorthand for Y and X only ('1.75rem 2.25rem')
-		if (paddingRem.length > 2) throw Error('Padding source not conform: ' + source)
+		let paddingY = 0
+		let paddingX = 0
 
-		let paddingY = paddingRem[0] ? Number.parseFloat(paddingRem[0]) : 0
-		let paddingX = paddingRem[1] ? Number.parseFloat(paddingRem[1]) : 0
+		// Must have padding for all or shorthand or Y and X only ('1.75rem 2.25rem')
+		if (paddingRem.length > 2) throw Error(`Padding source not conform: ${source}`)
+
+		if (paddingRem.length === 1) {
+			paddingY = paddingX = Number.parseFloat(paddingRem[0])
+		}
+
+		if (paddingRem.length === 2) {
+			paddingY = Number.parseFloat(paddingRem[0])
+			paddingX = Number.parseFloat(paddingRem[1])
+		}
 
 		paddingY = paddingY - extraY
 		paddingX = (paddingX - extraX) * 2
 
-		// don't forget to reverse Y and X for blockdata
+		// Switch order for blockdata
 		return [paddingX, paddingY]
 	}
 
-	// From blockdata to style attribute
+	// From blockdata to style property
 	if (Array.isArray(source)) {
 		let [paddingX, paddingY] = source
 
 		paddingX = paddingX / 2 + extraX
 		paddingY = paddingY + extraY
 
+		// Switch order for style property
 		return `${paddingY}rem ${paddingX}rem`
 	}
 
