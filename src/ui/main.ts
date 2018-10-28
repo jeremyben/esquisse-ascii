@@ -1,89 +1,65 @@
+import Vue from 'vue'
+
 import { toAscii } from '../html-to-ascii/to-ascii'
-import { toHtml } from '../ascii-to-html/to-html'
-import { guessCharMap, getCharMapFromRef } from '../characters-maps'
-import { convertPadding } from '../utils'
+import { parseAsciiText } from '../ascii-to-html/to-html'
+import { asciiFixture } from '../fixtures'
 
-const toggleBtn = document.querySelector('#toggle')!
-const charmapSelect = document.querySelector('select[name="charmap"]') as HTMLInputElement
-const paddingXInput = document.querySelector('input[name="paddingX"]') as HTMLInputElement
-const paddingYInput = document.querySelector('input[name="paddingY"]') as HTMLInputElement
+import EsquisseBlockComponent from './esquisse-block.component'
 
-document.addEventListener('DOMContentLoaded', event => {
-	const htmlContainer = document.querySelector('#container')!
+new Vue({
+	el: '#app',
 
-	const cardBody = htmlContainer.children[0].getElementsByClassName('card-body')[0]
-	const paddingStyle = (<any>cardBody).style.padding as string
+	components: {
+		'esquisse-block': EsquisseBlockComponent
+	},
 
-	const [paddingX, paddingY] = convertPadding(paddingStyle)
+	data: {
+		blocksData: <BlockData[]>[],
+		nextId: 1,
+		newBlockStartEditing: false,
+		asciiContent: asciiFixture
+	},
 
-	paddingXInput.value = String(paddingX)
-	paddingYInput.value = String(paddingY)
-})
+	methods: {
+		transform() {
+			this.asciiContent = toAscii(this.$refs.blocksContainer)
+		},
+		addBlock() {
+			this.blocksData.push(newEmptyBlock(this.nextId++))
+		},
+		deleteBlock(index) {
+			this.blocksData.splice(index, 1)
+		}
+	},
 
-toggleBtn.addEventListener('click', event => {
-	const htmlContainer = document.querySelector('#container')!
-	const asciiContainer = document.querySelector('#ascii')!
-
-	if (htmlContainer.innerHTML && !asciiContainer.textContent) {
-		const ascii = toAscii(htmlContainer)
-		asciiContainer.textContent = ascii
-		htmlContainer.innerHTML = ''
-	} else {
-		const newHtmlContainer = toHtml(asciiContainer.textContent!)
-		htmlContainer.parentNode!.replaceChild(newHtmlContainer, htmlContainer)
-		asciiContainer.textContent = ''
+	created() {
+		this.blocksData = parseAsciiText(this.asciiContent)
+		this.nextId = this.blocksData.length + 1
+	},
+	mounted() {
+		// After the first render of blocks, new blocks added will appear in editing mode.
+		this.newBlockStartEditing = true
 	}
 })
 
-charmapSelect.addEventListener('change', (event: HTMLInputEvent) => {
-	const newValue = event.target.value as CharMap['ref']
-	const htmlContainer = document.querySelector('#container')!
-	const asciiContainer = document.querySelector('#ascii')!
-
-	if (htmlContainer.innerHTML && !asciiContainer.textContent) {
-		const children = Array.from(htmlContainer.children)
-		for (const child of children) {
-			const oldValue = child.classList.item(1)!
-			child.classList.replace(oldValue, newValue)
-		}
-	} else {
-		const asciiText = asciiContainer.textContent!
-		const oldCharMap = guessCharMap(asciiText)
-		const newCharMap = getCharMapFromRef(newValue)
-
-		// TODO: Yep
-		asciiContainer.textContent = asciiText
-			.replace(new RegExp(oldCharMap.horizontal, 'g'), newCharMap.horizontal)
-			.replace(new RegExp(oldCharMap.vertical, 'g'), newCharMap.vertical)
-			.replace(new RegExp(oldCharMap.topLeft, 'g'), newCharMap.topLeft)
-			.replace(new RegExp(oldCharMap.topRight, 'g'), newCharMap.topRight)
-			.replace(new RegExp(oldCharMap.bottomLeft, 'g'), newCharMap.bottomLeft)
-			.replace(new RegExp(oldCharMap.bottomRight, 'g'), newCharMap.bottomRight)
-			.replace(new RegExp(oldCharMap.junctionLeft, 'g'), newCharMap.junctionLeft)
-			.replace(new RegExp(oldCharMap.junctionRight, 'g'), newCharMap.junctionRight)
-			.replace(new RegExp(oldCharMap.junctionTop, 'g'), newCharMap.junctionTop)
-			.replace(new RegExp(oldCharMap.junctionBottom, 'g'), newCharMap.junctionBottom)
-			.replace(new RegExp(oldCharMap.junctionMiddle, 'g'), newCharMap.junctionMiddle)
-	}
-})
-
-const paddingHandler = (event: HTMLInputEvent) => {
-	const htmlContainer = document.querySelector('#container')!
-	const asciiContainer = document.querySelector('#ascii')!
-
-	if (htmlContainer.innerHTML && !asciiContainer.textContent) {
-		const paddingX = parseInt(paddingXInput.value)
-		const paddingY = parseInt(paddingYInput.value)
-		const paddingStyle = convertPadding([paddingX, paddingY])
-
-		const children = Array.from(htmlContainer.children)
-		for (const child of children) {
-			const cardBody = child.getElementsByClassName('card-body')[0]
-			;(<any>cardBody).style.padding = paddingStyle
-		}
-	} else {
+function newEmptyBlock(id: number): BlockData {
+	return {
+		id,
+		charMapRef: 'unicode-single',
+		header: '',
+		lines: [''],
+		padding: [2, 0]
 	}
 }
 
-paddingXInput.addEventListener('change', paddingHandler)
-paddingYInput.addEventListener('change', paddingHandler)
+function mountVueBlock() {
+	const EsquisseBlockClass = Vue.extend(EsquisseBlockComponent)
+	const newEsquisse = new EsquisseBlockClass({
+		propsData: {
+			blockData: newEmptyBlock(1),
+			startEditing: true
+		}
+	})
+	newEsquisse.$mount()
+	this.$refs.blocksContainer.appendChild(newEsquisse.$el)
+}
