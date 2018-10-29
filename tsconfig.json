@@ -43,7 +43,7 @@
 		// "typeRoots": [],
 		// "types": [],
 		// "allowSyntheticDefaultImports": true,
-		"esModuleInterop": true
+		"esModuleInterop": true,
 		// "preserveSymlinks": true,
 
 		/* Source Map Options */
@@ -53,7 +53,7 @@
 		// "inlineSources": true,
 
 		/* Experimental Options */
-		// "experimentalDecorators": true,
-		// "emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true
 	}
 }

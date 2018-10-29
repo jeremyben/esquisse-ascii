@@ -1,58 +1,51 @@
-import { ComponentOptions } from 'vue'
+import Vue from 'vue'
+import Component from 'vue-class-component'
+import { Prop } from 'vue-property-decorator'
 
-export default <ComponentOptions<any>>{
+@Component({
 	inheritAttrs: false,
-
-	props: {
-		value: {
-			type: String,
-			required: true
-		},
-		center: {
-			type: Boolean,
-			default: false
-		}
-	},
-
 	template: `
 		<input type="text"
 			v-bind:class="{'mx-auto': center}"
 			v-bind:value="value"
 			v-on="inputListeners">
-	`,
+	`
+})
+export default class StretchInputComponent extends Vue {
+	@Prop({ type: String, required: true })
+	value: string
 
-	computed: {
-		inputListeners() {
-			// https://vuejs.org/v2/guide/components-custom-events.html#Binding-Native-Events-to-Components
+	@Prop({ type: Boolean, default: false })
+	center: boolean
 
-			const myListeners = {
-				input: event => {
-					this.$emit('input', event.target.value)
-					this.stretch(event.target)
-				}
-			}
+	stretch(element: HTMLElement) {
+		element.style.width = '0'
+		let widthUpdated = element.scrollWidth
 
-			return Object.assign({}, this.$listeners, myListeners)
+		const { boxSizing, borderLeftWidth, borderRightWidth } = getComputedStyle(element)
+
+		if (boxSizing === 'border-box') {
+			const borderXWidth = Number.parseInt(borderLeftWidth || '0') + Number.parseInt(borderRightWidth || '0')
+			widthUpdated += borderXWidth
 		}
-	},
 
-	methods: {
-		stretch(element: HTMLElement) {
-			element.style.width = '0'
-			let widthUpdated = element.scrollWidth
+		widthUpdated = Math.max(widthUpdated, 70) // largeur minimum
 
-			const { boxSizing, borderLeftWidth, borderRightWidth } = getComputedStyle(element)
+		element.style.width = `${widthUpdated}px`
+	}
 
-			if (boxSizing === 'border-box') {
-				const borderXWidth = Number.parseInt(borderLeftWidth || '0') + Number.parseInt(borderRightWidth || '0')
-				widthUpdated += borderXWidth
+	get inputListeners() {
+		// https://vuejs.org/v2/guide/components-custom-events.html#Binding-Native-Events-to-Components
+
+		const myListeners = {
+			input: event => {
+				this.$emit('input', event.target.value)
+				this.stretch(event.target)
 			}
-
-			widthUpdated = Math.max(widthUpdated, 70) // largeur minimum
-
-			element.style.width = `${widthUpdated}px`
 		}
-	},
+
+		return Object.assign({}, this.$listeners, myListeners)
+	}
 
 	mounted() {
 		this.stretch(this.$el)

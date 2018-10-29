@@ -1,9 +1,14 @@
-import { ComponentOptions } from 'vue'
+import Vue from 'vue'
+import Component from 'vue-class-component'
+import { Prop } from 'vue-property-decorator'
 import { convertPadding } from '../utils'
 import { charMaps } from '../characters-maps'
 import StretchInputComponent from './stretch-input.component'
 
-export default <ComponentOptions<any>>{
+@Component({
+	components: {
+		'stretch-input': StretchInputComponent
+	},
 	template: `
 		<div class="card" v-bind:class="blockData.charMapRef" v-bind:id="blockData.id">
 
@@ -60,78 +65,62 @@ export default <ComponentOptions<any>>{
 				</div>
 			</template>
 		</div>
-	`,
+	`
+})
+export default class EsquisseBlockComponent extends Vue {
+	@Prop({ type: Object, required: true })
+	blockData: BlockData
 
-	components: {
-		'stretch-input': StretchInputComponent
-	},
+	@Prop({ type: Boolean, default: false })
+	startEditing: boolean
 
-	props: {
-		blockData: {
-			type: Object,
-			required: true
-		},
-		startEditing: {
-			type: Boolean,
-			default: false
-		}
-	},
+	charMaps = charMaps
+	editing = this.startEditing
 
-	data() {
+	get cardBodyStyle() {
 		return {
-			charMaps,
-			editing: this.startEditing
+			padding: convertPadding([this.blockData.padding[0], this.blockData.padding[1]])
 		}
-	},
+	}
 
-	computed: {
-		cardBodyStyle() {
-			return {
-				padding: convertPadding([this.blockData.padding[0], this.blockData.padding[1]])
-			}
+	toggleEditing() {
+		if (this.editing) {
+			// Remove empty lines
+			this.blockData.lines = this.blockData.lines.filter(line => Boolean(line.trim()))
 		}
-	},
 
-	methods: {
-		toggleEditing() {
-			if (this.editing) {
-				// Remove empty lines
-				this.blockData.lines = this.blockData.lines.filter(line => Boolean(line.trim()))
-			}
+		this.editing = !this.editing
+	}
 
-			this.editing = !this.editing
-		},
-
-		addLine(index?: number) {
-			if (index == null) {
-				this.blockData.lines.push('')
-				const lastIndex = this.blockData.lines.length - 1
-				this.focusOnLine(lastIndex)
-				return
-			}
-
-			const nextIndex = index + 1
-			this.blockData.lines.splice(nextIndex, 0, '')
-			this.focusOnLine(nextIndex)
-		},
-
-		removeEmptyLine(value: string, index: number) {
-			if (value === '') {
-				const previousIndex = index - 1
-				this.blockData.lines.splice(index, 1)
-				if (previousIndex > -1) this.focusOnLine(previousIndex)
-			}
-		},
-
-		focusOnLine(index: number) {
-			this.$nextTick(() => {
-				if (!this.blockData.lines.length) return
-				if (index > this.blockData.lines.length - 1) return
-
-				if (index < 0) return this.$refs.header.$el.focus()
-
-				return this.$refs.line[index].$el.focus()
-			})
+	addLine(index?: number) {
+		if (index == null) {
+			this.blockData.lines.push('')
+			const lastIndex = this.blockData.lines.length - 1
+			this.focusOnLine(lastIndex)
+			return
 		}
+
+		const nextIndex = index + 1
+		this.blockData.lines.splice(nextIndex, 0, '')
+		this.focusOnLine(nextIndex)
+	}
+
+	removeEmptyLine(value: string, index: number) {
+		if (value === '') {
+			const previousIndex = index - 1
+			this.blockData.lines.splice(index, 1)
+			if (previousIndex > -1) this.focusOnLine(previousIndex)
+		}
+	}
+
+	focusOnLine(index: number) {
+		this.$nextTick(() => {
+			if (!this.blockData.lines.length) return
+			if (index > this.blockData.lines.length - 1) return
+
+			if (index < 0) return (this.$refs.header as Vue).$el.focus()
+
+			return this.$refs.line[index].$el.focus()
+		})
 	}
 }
