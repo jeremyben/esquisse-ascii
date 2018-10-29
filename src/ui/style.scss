@@ -3,8 +3,8 @@
 $card-border-color: #999;
 $card-border-radius: 0;
 
-$input-focus-width: 0.1rem;
-$btn-focus-width: 0.1rem;
+$input-focus-width: 0.05rem;
+$btn-focus-width: 0.15rem;
 $input-focus-box-shadow: 0 0 0 $input-focus-width $input-btn-focus-color;
 
 @import '../../node_modules/bootstrap/scss/grid';
@@ -19,18 +19,14 @@ $input-focus-box-shadow: 0 0 0 $input-focus-width $input-btn-focus-color;
 }
 
 .blocks-container {
-	@extend .d-flex, .justify-content-start, .align-items-start;
-
-	.card {
-		@extend .mr-5;
-		&:last-child {
-			@extend .mr-0;
-		}
-	}
+	position: relative;
+	height: 300px;
+	@extend .bg-light, .shadow;
 }
 
 .card {
 	display: inline-block;
+	position: absolute;
 
 	input,
 	select {
@@ -46,10 +42,12 @@ $input-focus-box-shadow: 0 0 0 $input-focus-width $input-btn-focus-color;
 
 .card-header {
 	text-align: center;
+	user-select: none;
 }
 
 .card-body p {
 	margin-bottom: 0;
+	user-select: none;
 }
 
 .card-btn-topleft,
@@ -61,39 +59,72 @@ $input-focus-box-shadow: 0 0 0 $input-focus-width $input-btn-focus-color;
 	z-index: 11;
 }
 
+$card-btn-shift-x: 1.375rem;
+$card-btn-shift-y: 1.375rem;
+
 .card-btn-topleft {
-	top: -0.85rem;
-	left: -0.65rem;
+	top: -$card-btn-shift-y;
+	left: -$card-btn-shift-x;
 }
 
 .card-btn-topright {
-	top: -0.85rem;
-	right: -0.65rem;
+	top: -$card-btn-shift-y;
+	right: -$card-btn-shift-x;
 }
 
 .card-btn-bottomleft {
-	bottom: -0.85rem;
-	left: -0.65rem;
+	bottom: -$card-btn-shift-y;
+	left: -$card-btn-shift-x;
 }
 
 .card-btn-bottomright {
-	bottom: -0.75rem;
-	right: -0.65rem;
+	bottom: -$card-btn-shift-y;
+	right: -$card-btn-shift-x;
 }
 
-.card-styling-form {
-	@extend .bg-light, .border, .p-2;
+.card-edit-padding-x,
+.card-edit-padding-y {
 	position: absolute;
-	bottom: calc(100% + 2px);
+	z-index: 11;
+
+	> input {
+		@extend .p-1, .bg-light;
+		height: auto;
+		width: 2.45rem;
+		font-weight: 500;
+		&:focus {
+			border-color: theme-color('info');
+			box-shadow: 0 0 0 $input-focus-width rgba(theme-color('info'), 0.25);
+		}
+	}
+}
+
+.card-edit-padding-x {
+	left: -$card-btn-shift-x;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.card-edit-padding-y {
+	top: -$card-btn-shift-y;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.card-edit-charmap {
+	position: absolute;
+	bottom: calc(100% + 1.65rem);
+	left: 50%;
+	transform: translateX(-50%);
+	width: 8rem;
 	z-index: 10;
 
-	label {
-		font-size: 0.875rem;
-		@extend .mr-2;
-	}
-
-	input[type='number'] {
-		width: 4rem;
+	> select {
+		@extend .p-1, .bg-light;
+		&:focus {
+			border-color: theme-color('info');
+			box-shadow: 0 0 0 $input-focus-width rgba(theme-color('info'), 0.25);
+		}
 	}
 }
 

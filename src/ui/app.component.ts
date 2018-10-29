@@ -13,9 +13,7 @@ import EsquisseBlockComponent from './esquisse-block.component'
 	},
 	template: `
 		<div class="container">
-			<div class="my-5 text-center">
-				<button class="btn btn-secondary ml-2 text-monospace" type="button" @click="addBlock">block++</button>
-			</div>
+			<button class="btn btn-secondary mb-4 text-monospace" type="button" @click="addBlock">block++</button>
 
 			<div ref="blocksContainer" class="blocks-container">
 				<esquisse-block

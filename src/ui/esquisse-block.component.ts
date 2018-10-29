@@ -4,67 +4,70 @@ import { Prop } from 'vue-property-decorator'
 import { convertPadding } from '../utils'
 import { charMaps } from '../characters-maps'
 import StretchInputComponent from './stretch-input.component'
+import interact from 'interactjs'
 
 @Component({
 	components: {
 		'stretch-input': StretchInputComponent
 	},
 	template: `
-		<div class="card" v-bind:class="blockData.charMapRef" v-bind:id="blockData.id">
+	<div class="card" v-bind:class="blockData.charMapRef" v-bind:id="'block' + blockData.id">
 
-			<div v-show="!editing">
-				<button class="card-btn-topleft border-primary" type="button" @click="toggleEditing">&#9999;</button>
+			<button class="card-btn-bottomright border-secondary" type="button">&#9995;</button>
 
-				<div class="card-header" v-show="blockData.header">{{ blockData.header }}</div>
+		<div v-show="!editing">
+			<button class="card-btn-topleft border-primary" type="button" @click="toggleEditing">&#9999;</button>
 
-				<div class="card-body" v-bind:style="cardBodyStyle">
-					<p v-for="line in blockData.lines">{{ line }}</p>
-				</div>
+			<div class="card-header" v-show="blockData.header">{{ blockData.header }}</div>
+
+			<div class="card-body" v-bind:style="cardBodyStyle">
+				<p v-for="line in blockData.lines">{{ line }}</p>
+			</div>
+		</div>
+
+		<template v-if="editing">
+			<button class="card-btn-topleft border-success" type="button" @click="toggleEditing">&#10004;</button>
+
+			<button class="card-btn-topright border-danger" type="button" @click="$emit('delete-block')">&#128465;</button>
+
+			<div class="card-edit-padding-x">
+				<input type="number" name="paddingX" v-model.number="blockData.padding[0]" min="0">
 			</div>
 
-			<template v-if="editing">
-				<button class="card-btn-topleft border-success" type="button" @click="toggleEditing">&#10004;</button>
+			<div class="card-edit-padding-y">
+				<input type="number" name="paddingY" v-model.number="blockData.padding[1]" min="0">
+			</div>
 
-				<button class="card-btn-topright border-danger" type="button" @click="$emit('delete-block')">&#128465;</button>
+			<button class="card-btn-bottomleft border-info text-info text-monospace" @click="addLine()">line++</button>
 
-				<div class="card-header">
-					<stretch-input
-						v-model="blockData.header"
-						v-bind:center="true"
-						@keydown.down="focusOnLine(0)"
-						ref="header">
-					</stretch-input>
-				</div>
+			<div class="card-edit-charmap">
+				<select name="charMap" v-model="blockData.charMapRef">
+					<option v-for="charMap in charMaps">{{ charMap.ref }}</option>
+				</select>
+			</div>
 
-				<div class="card-body" v-bind:style="cardBodyStyle">
-					<stretch-input
-						v-for="(line, index) in blockData.lines" v-model="blockData.lines[index]"
-						v-bind:key="index"
-						@keydown.up="focusOnLine(index - 1)"
-						@keydown.down="focusOnLine(index + 1)"
-						@keydown.enter="addLine(index)"
-						@keydown.delete="removeEmptyLine($event.target.value, index)"
-						ref="line">
-					</stretch-input>
-				</div>
+			<div class="card-header">
+				<stretch-input
+					v-model="blockData.header"
+					v-bind:center="true"
+					@keydown.down="focusOnLine(0)"
+					ref="header">
+				</stretch-input>
+			</div>
 
-				<button class="card-btn-bottomleft border-info text-info text-monospace" @click="addLine()">line++</button>
-
-				<div class="card-styling-form">
-					<select class="mb-1" name="charMap" v-model="blockData.charMapRef">
-						<option v-for="charMap in charMaps">{{ charMap.ref }}</option>
-					</select>
-					<div class="form-inline mb-1">
-						<label>Padding X</label>
-						<input type="number" name="paddingX" v-model.number="blockData.padding[0]" min="0">
-					</div>
-					<div class="form-inline">
-					<label>Padding Y</label>
-					<input type="number" name="paddingY" v-model.number="blockData.padding[1]" min="0">
-					</div>
-				</div>
-			</template>
-		</div>
+			<div class="card-body" v-bind:style="cardBodyStyle">
+				<stretch-input
+					v-for="(line, index) in blockData.lines" v-model="blockData.lines[index]"
+					v-bind:key="index"
+					@keydown.up="focusOnLine(index - 1)"
+					@keydown.down="focusOnLine(index + 1)"
+					@keydown.enter="addLine(index)"
+					@keydown.delete="removeEmptyLine($event.target.value, index)"
+					ref="line">
+				</stretch-input>
+			</div>
+		</template>
+	</div>
 	`
 })
 export default class EsquisseBlockComponent extends Vue {
@@ -77,6 +80,33 @@ export default class EsquisseBlockComponent extends Vue {
 	charMaps = charMaps
 	editing = this.startEditing
 
+	mounted() {
+		let x = 0
+		let y = 0
+
+		interact('#block' + this.blockData.id)
+			.draggable({
+				allowFrom: '.card-btn-bottomright',
+				snap: {
+					targets: [interact.createSnapGrid({ x: 30, y: 30 })],
+					range: Infinity,
+					relativePoints: [{ x: 0, y: 0 }]
+				},
+				inertia: false,
+				restrict: {
+					restriction: 'parent',
+					endOnly: true,
+					elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+				}
+			})
+			.on('dragmove', event => {
+				x += event.dx
+				y += event.dy
+
+				event.target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
+			})
+	}
+
 	get cardBodyStyle() {
 		return {
 			padding: convertPadding([this.blockData.padding[0], this.blockData.padding[1]])
@@ -85,8 +115,9 @@ export default class EsquisseBlockComponent extends Vue {
 
 	toggleEditing() {
 		if (this.editing) {
-			// Remove empty lines
+			// Remove empty lines and keep at least one
 			this.blockData.lines = this.blockData.lines.filter(line => Boolean(line.trim()))
+			if (!this.blockData.lines.length) this.blockData.lines.push('')
 		}
 
 		this.editing = !this.editing
