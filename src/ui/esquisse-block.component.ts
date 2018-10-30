@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import { Prop } from 'vue-property-decorator'
-import { convertPadding } from '../utils'
+import { convertPadding, roundTwoDecimals, roundQuarter } from '../utils'
 import { charMaps } from '../characters-maps'
 import StretchInputComponent from './stretch-input.component'
 import interact from 'interactjs'
@@ -13,7 +13,7 @@ import interact from 'interactjs'
 	template: `
 	<div class="card" v-bind:class="blockData.charMapRef" v-bind:id="'block' + blockData.id">
 
-			<button class="card-btn-bottomright border-secondary" type="button">&#9995;</button>
+		<button class="card-btn-bottomright border-secondary cursor-move" type="button">&#9995;</button>
 
 		<div v-show="!editing">
 			<button class="card-btn-topleft border-primary" type="button" @click="toggleEditing">&#9999;</button>
@@ -81,14 +81,20 @@ export default class EsquisseBlockComponent extends Vue {
 	editing = this.startEditing
 
 	mounted() {
+		// Constants and calulations to match text whitespaces and browser spacing
+		const fontSizeBase = 16 // 1rem = 16px (default browser font-size)
+		const offsetX = 0.25
+		const offsetY = 0.75
+		const stepX = fontSizeBase / 2 + offsetX
+		const stepY = fontSizeBase + offsetY
+
 		let x = 0
 		let y = 0
-
 		interact('#block' + this.blockData.id)
 			.draggable({
-				allowFrom: '.card-btn-bottomright',
+				allowFrom: '.cursor-move',
 				snap: {
-					targets: [interact.createSnapGrid({ x: 30, y: 30 })],
+					targets: [interact.createSnapGrid({ x: stepX, y: stepY })],
 					range: Infinity,
 					relativePoints: [{ x: 0, y: 0 }]
 				},
@@ -100,10 +106,15 @@ export default class EsquisseBlockComponent extends Vue {
 				}
 			})
 			.on('dragmove', event => {
-				x += event.dx
-				y += event.dy
+				let { dx, dy, restrict } = event
 
-				event.target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
+				x += roundQuarter(dx / fontSizeBase)
+				y += roundQuarter(dy / fontSizeBase)
+
+				if (restrict && restrict.dx > 0) x = 0
+				if (restrict && restrict.dy > 0) y = 0
+
+				event.target.style.transform = 'translate(' + x + 'rem, ' + y + 'rem)'
 			})
 	}
 

@@ -36,11 +36,15 @@ declare global {
 }
 
 // Augment and fix interactjs typings
-import { SnapFunction } from 'interactjs'
+import { SnapFunction, Position } from 'interactjs'
 
 declare module 'interactjs' {
 	export interface InteractStatic {
 		createSnapGrid(opt: { x: number; y: number; range?: number; offset?: Position }): SnapFunction
+	}
+
+	export interface InteractEvent {
+		restrict: { dx: number; dy: number }
 	}
 
 	export interface DraggableOptions {

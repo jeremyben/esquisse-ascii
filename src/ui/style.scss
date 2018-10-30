@@ -21,7 +21,7 @@ $input-focus-box-shadow: 0 0 0 $input-focus-width $input-btn-focus-color;
 .blocks-container {
 	position: relative;
 	height: 300px;
-	@extend .bg-light, .shadow;
+	@extend .bg-light, .shadow-sm;
 }
 
 .card {
@@ -80,6 +80,10 @@ $card-btn-shift-y: 1.375rem;
 .card-btn-bottomright {
 	bottom: -$card-btn-shift-y;
 	right: -$card-btn-shift-x;
+}
+
+.cursor-move {
+	cursor: move !important;
 }
 
 .card-edit-padding-x,

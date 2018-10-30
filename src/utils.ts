@@ -6,6 +6,21 @@ export function getMaxLength(strings: string[]) {
 }
 
 /**
+ * Round number to at most two decimals places
+ */
+export function roundTwoDecimals(value: number) {
+	// https://stackoverflow.com/a/52975077/4776628
+	return Math.round((value + 0.00001) * 100) / 100
+}
+
+/**
+ * Round number to the closest quarter (0, 0.25, 0.5, 0.75)
+ */
+export function roundQuarter(value: number) {
+	return Math.round(value * 4) / 4
+}
+
+/**
  * Convert HTML string to HTML element.
  */
 export function makeElementFromString(htmlString: string) {
