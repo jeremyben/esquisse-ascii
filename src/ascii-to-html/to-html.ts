@@ -1,4 +1,5 @@
-import { getMaxLength, makeElementFromString, convertPadding } from '../utils'
+import { getMaxLength, makeElementFromString } from '../utils'
+import { convertPadding } from '../spacing'
 import { guessCharMap } from '../characters-maps'
 
 /**

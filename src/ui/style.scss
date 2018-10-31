@@ -2,6 +2,8 @@
 
 $card-border-color: #999;
 $card-border-radius: 0;
+$card-spacer-y: 12px;
+$card-spacer-x: 0;
 
 $input-focus-width: 0.05rem;
 $btn-focus-width: 0.15rem;
@@ -43,6 +45,7 @@ $input-focus-box-shadow: 0 0 0 $input-focus-width $input-btn-focus-color;
 .card-header {
 	text-align: center;
 	user-select: none;
+	padding-bottom: $card-spacer-y - 1px; // to include border-bottom in height calculation
 }
 
 .card-body p {
@@ -139,6 +142,7 @@ $card-btn-shift-y: 1.375rem;
 	.card-header {
 		border-bottom-width: 3px;
 		border-bottom-style: double;
+		padding: ($card-spacer-y - 1px) $card-spacer-x ($card-spacer-y - 2px);
 	}
 }
 
@@ -147,6 +151,7 @@ $card-btn-shift-y: 1.375rem;
 
 	.card-header {
 		border-bottom-width: 2px;
+		padding: ($card-spacer-y - 1px) $card-spacer-x;
 	}
 }
 

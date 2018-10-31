@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import { Prop } from 'vue-property-decorator'
-import { convertPadding, roundTwoDecimals, roundQuarter } from '../utils'
 import { charMaps } from '../characters-maps'
+import { convertPadding, ratioX, ratioY } from '../spacing'
 import StretchInputComponent from './stretch-input.component'
 import interact from 'interactjs'
 
@@ -11,7 +11,7 @@ import interact from 'interactjs'
 		'stretch-input': StretchInputComponent
 	},
 	template: `
-	<div class="card" v-bind:class="blockData.charMapRef" v-bind:id="'block' + blockData.id">
+	<div class="card" v-bind:class="blockData.charMapRef" v-bind:id="'block' + blockData.id" v-bind:style="cardStyle">
 
 		<button class="card-btn-bottomright border-secondary cursor-move" type="button">&#9995;</button>
 
@@ -79,43 +79,43 @@ export default class EsquisseBlockComponent extends Vue {
 
 	charMaps = charMaps
 	editing = this.startEditing
+	topPosition = 0
+	leftPosition = 0
 
 	mounted() {
-		// Constants and calulations to match text whitespaces and browser spacing
-		const fontSizeBase = 16 // 1rem = 16px (default browser font-size)
-		const offsetX = 0.25
-		const offsetY = 0.75
-		const stepX = fontSizeBase / 2 + offsetX
-		const stepY = fontSizeBase + offsetY
-
-		let x = 0
-		let y = 0
 		interact('#block' + this.blockData.id)
 			.draggable({
 				allowFrom: '.cursor-move',
 				snap: {
-					targets: [interact.createSnapGrid({ x: stepX, y: stepY })],
+					targets: [interact.createSnapGrid({ x: ratioX, y: ratioY })],
 					range: Infinity,
 					relativePoints: [{ x: 0, y: 0 }]
 				},
-				inertia: false,
 				restrict: {
 					restriction: 'parent',
 					endOnly: true,
 					elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
-				}
+				},
+				inertia: false
 			})
 			.on('dragmove', event => {
 				let { dx, dy, restrict } = event
 
-				x += roundQuarter(dx / fontSizeBase)
-				y += roundQuarter(dy / fontSizeBase)
+				const isCorrectMove = dx % ratioX === 0 && dy % ratioY === 0
+				if (!restrict && !isCorrectMove) return
 
-				if (restrict && restrict.dx > 0) x = 0
-				if (restrict && restrict.dy > 0) y = 0
+				this.leftPosition += dx
+				this.topPosition += dy
 
-				event.target.style.transform = 'translate(' + x + 'rem, ' + y + 'rem)'
+				if (restrict && restrict.dx > 0) this.leftPosition = 0
+				if (restrict && restrict.dy > 0) this.topPosition = 0
 			})
+	}
+
+	get cardStyle() {
+		return {
+			transform: `translate(${this.leftPosition}px, ${this.topPosition}px)`
+		}
 	}
 
 	get cardBodyStyle() {

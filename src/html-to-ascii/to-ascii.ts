@@ -1,4 +1,5 @@
-import { getMaxLength, convertPadding } from '../utils'
+import { getMaxLength } from '../utils'
+import { convertPadding } from '../spacing'
 import { getCharMapFromRef } from '../characters-maps'
 
 /**

@@ -26,7 +26,7 @@ test('Single ascii component with padding', () => {
 	expect(header.className).toBe('card-header')
 
 	const firstEltBody = firstElt.children[1]
-	expect(getComputedStyle(firstEltBody).padding).toBe('2.75rem 1.25rem')
+	expect(getComputedStyle(firstEltBody).padding).toBe('60px 22.5px')
 })
 
 test('Ascii text to multiple components', () => {
@@ -67,5 +67,5 @@ test('Ascii text to multiple components', () => {
 	expect(thirdElt.id).toBe('3')
 	const thirdEltBody = thirdElt.firstElementChild!
 	expect(thirdEltBody.className).toBe('card-body')
-	expect(getComputedStyle(thirdEltBody).padding).toBe('1.75rem 1.25rem')
+	expect(getComputedStyle(thirdEltBody).padding).toBe('36px 22.5px')
 })

@@ -10,7 +10,7 @@ describe('Simple HTML components', () => {
 		document.body.innerHTML = `
 			<div id="container">
 				<div class="card unicode-single" id="1">
-					<div class="card-body" style="padding: 0.75rem 0.75rem">
+					<div class="card-body" style="padding: 12px 13.5px">
 						<p>Hello Boy</p>
 						<p>Yolo</p>
 					</div>
@@ -68,7 +68,7 @@ describe('Simple HTML components', () => {
 		document.body.innerHTML = `
 			<div id="container">
 				<div class="card unicode-double" id="1">
-					<div class="card-body" style="padding: 1.75rem 2.25rem">
+					<div class="card-body" style="padding: 36px 40.5px">
 						<p>Hello Boy</p>
 						<p>Yolo</p>
 					</div>
