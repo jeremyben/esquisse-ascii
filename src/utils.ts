@@ -3,6 +3,7 @@
  */
 export function getMaxLength(strings: string[]) {
 	return strings.reduce((maxLength, str) => Math.max(maxLength, str.length), 0)
+	// Math.max(...strings.map(str => str.length))
 }
 
 /**

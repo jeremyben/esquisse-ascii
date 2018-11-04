@@ -7,7 +7,7 @@ import { guessCharMap } from '../characters-maps'
  */
 export function toHtml(ascii: string): Element {
 	const blocks = parseAsciiText(ascii)
-	const elements = blocks.map(makeHtmlComponent)
+	const elements = blocks.map(makeHtmlElement)
 
 	const container = document.createElement('div')
 	container.id = 'blocks-container'
@@ -19,7 +19,7 @@ export function toHtml(ascii: string): Element {
 /**
  * Get HTML from block metadata
  */
-function makeHtmlComponent(block: BlockData): Element {
+function makeHtmlElement(block: BlockData): Element {
 	const { id, lines, header, padding, charMapRef, topLeft } = block
 	const paddingStyle = convertPadding(padding)
 	const translateStyle = convertTopLeftLocation(topLeft)

@@ -67,7 +67,7 @@ describe('Simple HTML components', () => {
 		const warnSpy = jest.spyOn(console, 'warn')
 		document.body.innerHTML = `
 			<div id="container">
-				<div class="card unicode-double" id="block1" style="transform: translate(0px, 0px)">
+				<div class="card unicode-double" id="block1" style="transform: translate(18px, 24px)">
 					<div class="card-body" style="padding: 36px 40.5px">
 						<p>Hello Boy</p>
 						<p>Yolo</p>
@@ -81,12 +81,13 @@ describe('Simple HTML components', () => {
 		expect(warnSpy).not.toHaveBeenCalled()
 
 		const expected = [
-			'╔═════════════════╗',
-			'║                 ║',
-			'║    Hello Boy    ║',
-			'║    Yolo         ║',
-			'║                 ║',
-			'╚═════════════════╝'
+			'',
+			'  ╔═════════════════╗',
+			'  ║                 ║',
+			'  ║    Hello Boy    ║',
+			'  ║    Yolo         ║',
+			'  ║                 ║',
+			'  ╚═════════════════╝'
 		].join('\n')
 
 		expect(ascii).toBe(expected)
