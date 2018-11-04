@@ -31,7 +31,9 @@ import EsquisseBlockComponent from './esquisse-block.component'
 				<button type="button" @click="transform">ASCII &#129095;</button>
 			</div>
 
-			<pre>{{ asciiContent }}</pre>
+			<pre class="border" v-bind:class="{'bg-dark text-white': darkTheme}">{{ asciiContent }}</pre>
+
+			<button class="theme-btn" type="button" @click="darkTheme = !darkTheme">Switch theme</button>
 		</div>
 	`
 })
@@ -40,6 +42,7 @@ export default class AppComponent extends Vue {
 	nextId = 1
 	newBlockStartEditing = false
 	asciiContent = asciiFixture
+	darkTheme = false
 
 	created() {
 		this.blocksData = parseAsciiText(this.asciiContent)

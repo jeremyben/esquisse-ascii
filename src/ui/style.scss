@@ -2,11 +2,12 @@
 
 $card-border-color: #999;
 $card-border-radius: 0;
+$card-cap-bg: rgba($black, 0.015);
 $card-spacer-y: 12px;
 $card-spacer-x: 0;
 
 $input-focus-width: 0.05rem;
-$btn-focus-width: 0.15rem;
+$btn-focus-width: 0.1rem;
 $input-focus-box-shadow: 0 0 0 $input-focus-width $input-btn-focus-color;
 
 @import '../../node_modules/bootstrap/scss/grid';
@@ -182,4 +183,9 @@ $card-btn-shift-y: 1.375rem;
 	hr {
 		@extend .border-primary;
 	}
+}
+
+.theme-btn {
+	@extend .btn, .btn-outline-secondary, .btn-sm;
+	float: right;
 }
