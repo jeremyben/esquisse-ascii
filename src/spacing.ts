@@ -2,6 +2,16 @@
 export const ratioX = 9
 export const ratioY = 24
 
+export function toPixel(source: [number, number]): [number, number] {
+	const [x, y] = source
+	return [x * ratioX, y * ratioY]
+}
+
+export function toChar(source: [number, number]): [number, number] {
+	const [x, y] = source
+	return [x / ratioX, y / ratioY]
+}
+
 export function convertPadding(source: BlockData['padding']): string
 export function convertPadding(source: string): BlockData['padding']
 export function convertPadding(source: string | BlockData['padding']): string | BlockData['padding'] {
@@ -42,4 +52,26 @@ export function convertPadding(source: string | BlockData['padding']): string | 
 	}
 
 	throw Error(`Padding source not conform: ${JSON.stringify(source)}`)
+}
+
+export function convertTopLeftLocation(source: BlockData['topLeft']): string
+export function convertTopLeftLocation(source: string): BlockData['topLeft']
+export function convertTopLeftLocation(source: string | BlockData['topLeft']): string | BlockData['topLeft'] {
+	// From style property to blockdata
+	if (typeof source === 'string') {
+		const translatePixel = source.split(', ')
+		const translatePixelX = Number.parseFloat(translatePixel[0])
+		const translatePixelY = Number.parseFloat(translatePixel[1])
+
+		return toChar([translatePixelX, translatePixelY])
+	}
+
+	// From blockdata to style property
+	if (Array.isArray(source)) {
+		const [translatePixelX, translatePixelY] = toPixel(source)
+
+		return `${translatePixelX}px, ${translatePixelY}px`
+	}
+
+	throw Error(`topLeft source not conform: ${JSON.stringify(source)}`)
 }

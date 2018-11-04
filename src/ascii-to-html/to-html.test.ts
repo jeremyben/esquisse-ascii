@@ -15,12 +15,13 @@ test('Single ascii component with padding', () => {
 	].join('\n')
 
 	const container = toHtml(ascii)
-	expect(container.id).toBe('container')
+	expect(container.id).toBe('blocks-container')
 	expect(container.children).toHaveLength(1)
 
 	const firstElt = container.children[0]
 	expect(firstElt.className).toBe('card ascii-rounded')
-	expect(firstElt.id).toBe('1')
+	expect(firstElt.id).toBe('block1')
+	expect(getComputedStyle(firstElt).transform).toBe('translate(0px, 0px)')
 
 	const header = firstElt.children[0]
 	expect(header.className).toBe('card-header')
@@ -44,16 +45,18 @@ test('Ascii text to multiple components', () => {
 	].join('\n')
 
 	const container = toHtml(ascii)
-	expect(container.id).toBe('container')
+	expect(container.id).toBe('blocks-container')
 	// console.log('container', container.innerHTML)
 
 	expect(container.children).toHaveLength(3)
 	const firstElt = container.children[0]
-	expect(firstElt.id).toBe('1')
+	expect(firstElt.id).toBe('block1')
 	expect(firstElt.className).toBe('card unicode-single')
+	expect(getComputedStyle(firstElt).transform).toBe('translate(189px, 0px)')
 
 	const secondElt = container.children[1]
-	expect(secondElt.id).toBe('2')
+	expect(secondElt.id).toBe('block2')
+	expect(getComputedStyle(secondElt).transform).toBe('translate(9px, 72px)')
 	expect(secondElt.firstElementChild!.className).toBe('card-header')
 	expect(secondElt.firstElementChild!.textContent).toBe('Titles')
 
@@ -64,7 +67,8 @@ test('Ascii text to multiple components', () => {
 	expect(secondEltSection.children[1].textContent).toBe('Yolo')
 
 	const thirdElt = container.children[2]
-	expect(thirdElt.id).toBe('3')
+	expect(thirdElt.id).toBe('block3')
+	expect(getComputedStyle(thirdElt).transform).toBe('translate(189px, 72px)')
 	const thirdEltBody = thirdElt.firstElementChild!
 	expect(thirdEltBody.className).toBe('card-body')
 	expect(getComputedStyle(thirdEltBody).padding).toBe('36px 22.5px')

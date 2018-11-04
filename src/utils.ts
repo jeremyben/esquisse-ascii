@@ -6,7 +6,7 @@ export function getMaxLength(strings: string[]) {
 }
 
 /**
- * Round number to at most two decimals places
+ * Round number to at most two decimals places.
  */
 export function roundTwoDecimals(value: number) {
 	// https://stackoverflow.com/a/52975077/4776628
@@ -14,10 +14,20 @@ export function roundTwoDecimals(value: number) {
 }
 
 /**
- * Round number to the closest quarter (0, 0.25, 0.5, 0.75)
+ * Round number to the closest quarter (0, 0.25, 0.5, 0.75).
  */
 export function roundQuarter(value: number) {
 	return Math.round(value * 4) / 4
+}
+
+/**
+ * Check shallowly if two arrays are identical.
+ */
+export function sameArrays<T>(a: T[], b: T[]) {
+	for (let i = 0; i < a.length; ++i) {
+		if (a[i] !== b[i]) return false
+	}
+	return true
 }
 
 /**

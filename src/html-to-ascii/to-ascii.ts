@@ -1,5 +1,5 @@
 import { getMaxLength } from '../utils'
-import { convertPadding } from '../spacing'
+import { convertPadding, convertTopLeftLocation } from '../spacing'
 import { getCharMapFromRef } from '../characters-maps'
 
 /**
@@ -93,13 +93,14 @@ function parseHtmlComponent(component: Element): BlockData {
 	const id = getId(component)
 	const lines = getLines(component)
 	const header = getHeaderContent(component)
-	const padding = getPadding(component)
 	const charMapRef = getCharMapRef(component)
+	const padding = getPadding(component)
+	const topLeft = getTopLeftLocation(component)
 
-	return { id, lines, header, padding, charMapRef }
+	return { id, lines, header, padding, charMapRef, topLeft }
 
 	function getId(component: Element) {
-		return Number.parseInt(component.id, 10)
+		return Number.parseInt(component.id.replace('block', ''), 10)
 	}
 
 	function getLines(component: Element) {
@@ -116,20 +117,6 @@ function parseHtmlComponent(component: Element): BlockData {
 		return headerElement.textContent!.trim()
 	}
 
-	function getPadding(component: Element): BlockData['padding'] {
-		const cardBody = component.getElementsByClassName('card-body')[0]
-		const styleAttr = cardBody.getAttribute('style')
-
-		if (!styleAttr || !styleAttr.includes('padding')) {
-			console.warn(`No padding on component ${component.id}, using default`)
-			return [1, 0]
-		}
-
-		// TODO: better parsing for multiple styles
-		const paddingStyle = styleAttr.replace(/padding: ?/, '')
-		return convertPadding(paddingStyle)
-	}
-
 	function getCharMapRef(component: Element): CharMap['ref'] {
 		const charMapRef = component.classList.item(1) as CharMap['ref']
 
@@ -139,5 +126,38 @@ function parseHtmlComponent(component: Element): BlockData {
 		}
 
 		return charMapRef
+	}
+
+	function getPadding(component: Element): BlockData['padding'] {
+		const cardBody = component.getElementsByClassName('card-body')[0]
+		const styleAttr = cardBody.getAttribute('style')
+		const paddingCapture = /padding: ?([px0-9. ]+)/
+		let paddingStyle: string
+
+		try {
+			paddingStyle = styleAttr!.match(paddingCapture)![1]
+			if (!paddingStyle.includes('px')) throw Error
+		} catch (error) {
+			console.warn(`No padding on component ${component.id}, using default`)
+			return [1, 0]
+		}
+
+		return convertPadding(paddingStyle)
+	}
+
+	function getTopLeftLocation(component: Element): BlockData['topLeft'] {
+		const styleAttr = component.getAttribute('style')
+		const translateCapture = /transform: ?translate\(([px0-9,. ]+)\)/
+		let translateStyle: string
+
+		try {
+			translateStyle = styleAttr!.match(translateCapture)![1]
+			if (!translateStyle.includes('px')) throw Error
+		} catch (error) {
+			console.warn(`No location on component ${component.id}, default to 0,0`)
+			return [0, 0]
+		}
+
+		return convertTopLeftLocation(translateStyle)
 	}
 }

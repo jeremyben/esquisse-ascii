@@ -1,3 +1,5 @@
+export {}
+
 declare global {
 	/**
 	 * Ascii characters map
@@ -26,28 +28,11 @@ declare global {
 		header: string
 		padding: [number, number] // X Y,
 		charMapRef: CharMap['ref']
-		topLeftLocation?: [number, number] // X Y
-		bottomRightLocation?: [number, number] // X Y
+		topLeft: [number, number] // X Y
+		bottomRight?: [number, number] // X Y
 	}
 
 	interface HTMLInputEvent extends Event {
 		target: HTMLInputElement & EventTarget
-	}
-}
-
-// Augment and fix interactjs typings
-import { SnapFunction, Position } from 'interactjs'
-
-declare module 'interactjs' {
-	export interface InteractStatic {
-		createSnapGrid(opt: { x: number; y: number; range?: number; offset?: Position }): SnapFunction
-	}
-
-	export interface InteractEvent {
-		restrict: { dx: number; dy: number }
-	}
-
-	export interface DraggableOptions {
-		allowFrom?: string
 	}
 }

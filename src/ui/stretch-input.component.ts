@@ -18,20 +18,19 @@ export default class StretchInputComponent extends Vue {
 	@Prop({ type: Boolean, default: false })
 	center: boolean
 
-	stretch(element: HTMLElement) {
-		element.style.width = '0'
-		let widthUpdated = element.scrollWidth
+	stretch() {
+		this.$el.style.width = '0'
 
-		const { boxSizing, borderLeftWidth, borderRightWidth } = getComputedStyle(element)
+		let widthUpdated = this.$el.scrollWidth
 
+		const { boxSizing, borderLeftWidth, borderRightWidth } = getComputedStyle(this.$el)
 		if (boxSizing === 'border-box') {
-			const borderXWidth = Number.parseInt(borderLeftWidth || '0') + Number.parseInt(borderRightWidth || '0')
-			widthUpdated += borderXWidth
+			widthUpdated += Number.parseInt(borderLeftWidth || '0') + Number.parseInt(borderRightWidth || '0')
 		}
 
 		widthUpdated = Math.max(widthUpdated, 70) // largeur minimum
 
-		element.style.width = `${widthUpdated}px`
+		this.$el.style.width = `${widthUpdated}px`
 	}
 
 	get inputListeners() {
@@ -40,7 +39,7 @@ export default class StretchInputComponent extends Vue {
 		const myListeners = {
 			input: event => {
 				this.$emit('input', event.target.value)
-				this.stretch(event.target)
+				this.stretch()
 			}
 		}
 
@@ -48,6 +47,6 @@ export default class StretchInputComponent extends Vue {
 	}
 
 	mounted() {
-		this.stretch(this.$el)
+		this.stretch()
 	}
 }

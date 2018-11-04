@@ -5,11 +5,11 @@ describe('Simple HTML components', () => {
 		jest.restoreAllMocks()
 	})
 
-	test('HTML component without padding attributes', () => {
+	test('HTML component', () => {
 		const warnSpy = jest.spyOn(console, 'warn')
 		document.body.innerHTML = `
 			<div id="container">
-				<div class="card unicode-single" id="1">
+				<div class="card unicode-single" id="block1" style="transform: translate(0px, 0px)">
 					<div class="card-body" style="padding: 12px 13.5px">
 						<p>Hello Boy</p>
 						<p>Yolo</p>
@@ -37,7 +37,7 @@ describe('Simple HTML components', () => {
 		const warnSpy = jest.spyOn(console, 'warn')
 		document.body.innerHTML = `
 			<div id="container">
-				<div class="card" id="1">
+				<div class="card" id="block1">
 					<div class="card-header">Titles</div>
 					<div class="card-body">
 						<p>Hello Boy</p>
@@ -49,7 +49,7 @@ describe('Simple HTML components', () => {
 
 		const container = document.querySelector('#container')!
 		const ascii = toAscii(container)
-		expect(warnSpy).toHaveBeenCalledTimes(2)
+		expect(warnSpy).toHaveBeenCalledTimes(3)
 
 		const expected = [
 			'┌───────────┐',
@@ -67,7 +67,7 @@ describe('Simple HTML components', () => {
 		const warnSpy = jest.spyOn(console, 'warn')
 		document.body.innerHTML = `
 			<div id="container">
-				<div class="card unicode-double" id="1">
+				<div class="card unicode-double" id="block1" style="transform: translate(0px, 0px)">
 					<div class="card-body" style="padding: 36px 40.5px">
 						<p>Hello Boy</p>
 						<p>Yolo</p>

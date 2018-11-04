@@ -1,10 +1,12 @@
+import { fromEvent, Subject, Observable } from 'rxjs'
+import { distinctUntilChanged, map, startWith, switchMapTo, takeUntil, tap } from 'rxjs/operators'
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import { Prop } from 'vue-property-decorator'
 import { charMaps } from '../characters-maps'
-import { convertPadding, ratioX, ratioY } from '../spacing'
+import { convertPadding, ratioX, ratioY, convertTopLeftLocation, toPixel, toChar } from '../spacing'
+import { sameArrays } from '../utils'
 import StretchInputComponent from './stretch-input.component'
-import interact from 'interactjs'
 
 @Component({
 	components: {
@@ -13,7 +15,7 @@ import interact from 'interactjs'
 	template: `
 	<div class="card" v-bind:class="blockData.charMapRef" v-bind:id="'block' + blockData.id" v-bind:style="cardStyle">
 
-		<button class="card-btn-bottomright border-secondary cursor-move" type="button">&#9995;</button>
+		<button class="card-btn-bottomright border-secondary cursor-move" ref="move" type="button">&#9995;</button>
 
 		<div v-show="!editing">
 			<button class="card-btn-topleft border-primary" type="button" @click="toggleEditing">&#9999;</button>
@@ -77,51 +79,83 @@ export default class EsquisseBlockComponent extends Vue {
 	@Prop({ type: Boolean, default: false })
 	startEditing: boolean
 
-	charMaps = charMaps
 	editing = this.startEditing
-	topPosition = 0
-	leftPosition = 0
+	charMaps = charMaps
+
+	unsub$ = new Subject<void>()
 
 	mounted() {
-		interact('#block' + this.blockData.id)
-			.draggable({
-				allowFrom: '.cursor-move',
-				snap: {
-					targets: [interact.createSnapGrid({ x: ratioX, y: ratioY })],
-					range: Infinity,
-					relativePoints: [{ x: 0, y: 0 }]
-				},
-				restrict: {
-					restriction: 'parent',
-					endOnly: true,
-					elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
-				},
-				inertia: false
-			})
-			.on('dragmove', event => {
-				let { dx, dy, restrict } = event
+		this.makeDraggablefrom(this.$refs.move as Element)
+	}
 
-				const isCorrectMove = dx % ratioX === 0 && dy % ratioY === 0
-				if (!restrict && !isCorrectMove) return
-
-				this.leftPosition += dx
-				this.topPosition += dy
-
-				if (restrict && restrict.dx > 0) this.leftPosition = 0
-				if (restrict && restrict.dy > 0) this.topPosition = 0
-			})
+	destroyed() {
+		this.unsub$.next()
+		this.unsub$.complete()
 	}
 
 	get cardStyle() {
 		return {
-			transform: `translate(${this.leftPosition}px, ${this.topPosition}px)`
+			transform: `translate(${convertTopLeftLocation(this.blockData.topLeft)})`
 		}
 	}
 
 	get cardBodyStyle() {
 		return {
-			padding: convertPadding([this.blockData.padding[0], this.blockData.padding[1]])
+			padding: convertPadding(this.blockData.padding)
 		}
+	}
+
+	makeDraggablefrom(element: Element = this.$el) {
+		const mouseDown$ = fromEvent<MouseEvent>(element, 'mousedown')
+		const mouseMove$ = fromEvent<MouseEvent>(document, 'mousemove')
+		const mouseUp$ = fromEvent<MouseEvent>(document, 'mouseup')
+		const mouseDrag$ = mouseDown$.pipe(switchMapTo(mouseMove$.pipe(takeUntil(mouseUp$))))
+
+		// Keep accumulators different from component state to update in steps instead of realtime
+		let accX = 0
+		let accY = 0
+
+		const updatePosition$ = mouseDrag$.pipe(
+			map(event => [event.movementX, event.movementY]),
+			startWith(toPixel(this.blockData.topLeft)),
+			tap(([x, y]) => {
+				// Update accumulators
+				accX += x
+				accY += y
+
+				// Bound to container
+				const elRect = this.$el.getBoundingClientRect()
+				const containerRect = (this.$root.$refs.blocksContainer as Element).getBoundingClientRect()
+
+				// Left
+				if (accX < 0) accX = 0
+
+				// Right
+				if (elRect.right > containerRect.right) {
+					accX = Math.round(containerRect.width - elRect.width)
+				}
+
+				// Top
+				if (accY < 0) accY = 0
+
+				// Bottom
+				if (elRect.bottom > containerRect.bottom) {
+					accY = Math.round(containerRect.height - elRect.height)
+				}
+			}),
+			map(() => {
+				// Release values from accumulators step by step according to ratio
+				const x = Math.floor(accX / ratioX) * ratioX
+				const y = Math.floor(accY / ratioY) * ratioY
+				return [x, y] as [number, number]
+			}),
+			distinctUntilChanged(sameArrays),
+			takeUntil(this.unsub$)
+		)
+
+		updatePosition$.subscribe(xy => {
+			this.blockData.topLeft = toChar(xy)
+		})
 	}
 
 	toggleEditing() {

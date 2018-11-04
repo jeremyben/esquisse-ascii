@@ -15,7 +15,7 @@ import EsquisseBlockComponent from './esquisse-block.component'
 		<div class="container">
 			<button class="btn btn-secondary mb-4 text-monospace" type="button" @click="addBlock">block++</button>
 
-			<div ref="blocksContainer" class="blocks-container">
+			<div ref="blocksContainer" id="blocks-container">
 				<esquisse-block
 					v-for="(blockData, index) of blocksData"
 					v-bind:key="blockData.id"
@@ -69,7 +69,8 @@ export default class AppComponent extends Vue {
 			charMapRef: 'unicode-single',
 			header: '',
 			lines: [''],
-			padding: [2, 0]
+			padding: [2, 0],
+			topLeft: [0, 0]
 		}
 	}
 }

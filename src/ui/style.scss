@@ -20,7 +20,7 @@ $input-focus-box-shadow: 0 0 0 $input-focus-width $input-btn-focus-color;
 	display: none;
 }
 
-.blocks-container {
+#blocks-container {
 	position: relative;
 	height: 300px;
 	@extend .bg-light, .shadow-sm;

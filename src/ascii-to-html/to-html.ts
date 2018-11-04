@@ -1,5 +1,5 @@
 import { getMaxLength, makeElementFromString } from '../utils'
-import { convertPadding } from '../spacing'
+import { convertPadding, convertTopLeftLocation } from '../spacing'
 import { guessCharMap } from '../characters-maps'
 
 /**
@@ -10,7 +10,7 @@ export function toHtml(ascii: string): Element {
 	const elements = blocks.map(makeHtmlComponent)
 
 	const container = document.createElement('div')
-	container.id = 'container'
+	container.id = 'blocks-container'
 	container.append(...elements)
 
 	return container
@@ -20,16 +20,17 @@ export function toHtml(ascii: string): Element {
  * Get HTML from block metadata
  */
 function makeHtmlComponent(block: BlockData): Element {
-	const { id, lines, header, padding, charMapRef } = block
+	const { id, lines, header, padding, charMapRef, topLeft } = block
 	const paddingStyle = convertPadding(padding)
+	const translateStyle = convertTopLeftLocation(topLeft)
 
-	let html = `<div class="card ${charMapRef}" id="${id}">`
+	let html = `<div class="card ${charMapRef}" id="block${id}" style="transform: translate(${translateStyle})">`
 
 	if (header) {
 		html += `<div class="card-header">${header}</div>`
 	}
 
-	html += `<div class="card-body" style="padding:${paddingStyle}">`
+	html += `<div class="card-body" style="padding: ${paddingStyle}">`
 	for (const line of lines) {
 		html += `<p>${line}</p>`
 	}
@@ -67,7 +68,7 @@ export function parseAsciiText(asciiText: string): BlockData[] {
 				lines: [],
 				header: '',
 				padding: [0, 0],
-				topLeftLocation: [res.index, rowIndex],
+				topLeft: [res.index, rowIndex],
 				charMapRef: charMap.ref
 			})
 		}
@@ -94,7 +95,7 @@ export function parseAsciiText(asciiText: string): BlockData[] {
 			const block = getCorrectBlock(blocks, res.index)
 
 			// Ends block with bottom location
-			if (block) block.bottomRightLocation = [bottomRegex.lastIndex, rowIndex]
+			if (block) block.bottomRight = [bottomRegex.lastIndex, rowIndex]
 		}
 	})
 
@@ -121,14 +122,14 @@ export function parseAsciiText(asciiText: string): BlockData[] {
 
 	function getCorrectBlock(blocks: BlockData[], xAxis: number) {
 		// block starting on same axis and not ended (without bottom bar)
-		return blocks.find(block => block.topLeftLocation![0] === xAxis && block.bottomRightLocation == null)
+		return blocks.find(block => block.topLeft![0] === xAxis && block.bottomRight == null)
 	}
 
 	function getPadding(block: BlockData) {
 		// Padding X
 		const innerWidth = getMaxLength(block.lines)
-		const [leftBorderX] = block.topLeftLocation!
-		const [rightBorderX] = block.bottomRightLocation!
+		const leftBorderX = block.topLeft[0]
+		const rightBorderX = block.bottomRight![0]
 		const x = (rightBorderX - leftBorderX - 2 - innerWidth) / 2
 
 		// Padding Y
